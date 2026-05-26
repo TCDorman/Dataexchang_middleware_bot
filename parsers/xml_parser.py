@@ -1,11 +1,11 @@
-from pathlib import Path
-import xml.etree.ElementTree as ET
 import sys
 from pathlib import Path
+import xml.etree.ElementTree as ET
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
 from models.wms_models import WMSItem, WMSOrder, WMSOrderLine
+from validators.wms_validator import validate_items, validate_orders
 
 
 def parse_xml_file(file_path: str):
@@ -70,10 +70,19 @@ if __name__ == "__main__":
     items = parse_items("data/sample_files/CFG-IMP-ARTICOLI.xml")
     orders = parse_orders("data/sample_files/CFG-IMP-ORDINI.xml")
 
+    item_errors = validate_items(items)
+    order_errors = validate_orders(orders)
+
     print("\nITEMS")
     for item in items:
         print(item)
 
+    print("\nITEM VALIDATION")
+    print(item_errors if item_errors else "No item validation errors")
+
     print("\nORDERS")
     for order in orders:
         print(order)
+
+    print("\nORDER VALIDATION")
+    print(order_errors if order_errors else "No order validation errors")

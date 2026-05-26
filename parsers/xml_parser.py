@@ -65,6 +65,36 @@ def parse_orders(file_path: str):
 
     return orders
 
+def parse_export_orders(file_path: str):
+    root = parse_xml_file(file_path)
+    orders = []
+
+    for order_node in root.findall("EXP_ORDINI"):
+        lines = []
+
+        for line_node in order_node.findall("EXP_ORDINI_RIGHE"):
+            line = WMSOrderLine(
+                order_number=clean_text(line_node.findtext("RIG_ORDINE")),
+                item_code=clean_text(line_node.findtext("RIG_ARTICOLO")),
+                quantity=float(clean_text(line_node.findtext("RIG_QTAE")) or 0),
+                sub1=clean_text(line_node.findtext("RIG_SUB1")),
+                warehouse_task=clean_text(line_node.findtext("RIG_ATTR1")),
+                source_bin=clean_text(line_node.findtext("RIG_ATTR2")),
+                destination_bin=clean_text(line_node.findtext("RIG_ATTR3")),
+            )
+            lines.append(line)
+
+        order = WMSOrder(
+            order_number=clean_text(order_node.findtext("ORD_ORDINE")),
+            operation_type=clean_text(order_node.findtext("ORD_TIPOOP")),
+            warehouse_number=clean_text(order_node.findtext("ORD_ATTR1")),
+            bay_number=clean_text(order_node.findtext("ORD_ELEBAIE")),
+            lines=lines,
+        )
+        orders.append(order)
+
+    return orders
+
 
 if __name__ == "__main__":
     items = parse_items("data/sample_files/CFG-IMP-ARTICOLI.xml")
@@ -86,3 +116,9 @@ if __name__ == "__main__":
 
     print("\nORDER VALIDATION")
     print(order_errors if order_errors else "No order validation errors")
+
+    export_orders = parse_export_orders("data/sample_files/CFG-EXP-ORDINI.xml")
+
+print("\nEXPORT ORDERS")
+for order in export_orders:
+    print(order)

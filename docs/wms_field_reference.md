@@ -1,104 +1,66 @@
 # Modula WMS Field Reference
 
----
+## Item Import: `CFG-IMP-ARTICOLI.xml`
 
-# Item Import Format
+Root node: `MODULA_WMS`  
+Entity node: `IMP_ARTICOLI`
 
-## Root Node
-```xml
-<MODULA_WMS>
-```
-
-## Entity
-```xml
-<IMP_ARTICOLI>
-```
-
-## Fields
-
-| Field | Description | Example | Required |
+| WMS Field | Internal Field | Description | Required |
 |---|---|---|---|
-| ART_ARTICOLO | Item code / SKU | ITEM001 | Yes |
-| ART_DES | Item description | ITEM001 Description | Yes |
-
-## Example
-
-```xml
-<MODULA_WMS>
-    <IMP_ARTICOLI>
-        <ART_ARTICOLO>ITEM001</ART_ARTICOLO>
-        <ART_DES>ITEM001 Description</ART_DES>
-    </IMP_ARTICOLI>
-</MODULA_WMS>
-```
+| ART_ARTICOLO | item_code | Item/SKU code | Yes |
+| ART_DES | description | Item description | No |
 
 ---
 
-# Order Import Format
+## Order Import: `CFG-IMP-ORDINI.xml`
 
-## Root Node
-```xml
-<SYSTORE>
-```
+Root node: `SYSTORE`  
+Header node: `IMP_ORDINI`  
+Line node: `IMP_ORDINI_RIGHE`
 
-## Order Header Entity
-```xml
-<IMP_ORDINI>
-```
+### Header Fields
 
-## Order Line Entity
-```xml
-<IMP_ORDINI_RIGHE>
-```
-
----
-
-# Order Header Fields
-
-| Field | Description | Example | Required |
+| WMS Field | Internal Field | Description | Required |
 |---|---|---|---|
-| ORD_ORDINE | Order number | ORDER11 | Yes |
-| ORD_DES | Order description | ORDER 11 | Yes |
-| ORD_TIPOOP | Operation type | P | Yes |
+| ORD_ORDINE | order_number | Order number | Yes |
+| ORD_DES | description | Order description | No |
+| ORD_TIPOOP | operation_type | Operation type, example: P | Yes |
 
----
+### Line Fields
 
-# Order Line Fields
-
-| Field | Description | Example | Required |
+| WMS Field | Internal Field | Description | Required |
 |---|---|---|---|
-| RIG_ORDINE | Order number reference | ORDER11 | Yes |
-| RIG_ARTICOLO | Item code | ITEM01 | Yes |
-| RIG_QTAR | Requested quantity | 2 | Yes |
-| RIG_SUB1 | Sub field 1 | NULL | No |
-| RIG_SUB2 | Sub field 2 | NULL | No |
-| RIG_STAMATE | Unknown/optional | NULL | No |
-| RIG_TIPOCONF | Configuration type | NULL | No |
-| RIG_HOSTINF | Host info | NULL | No |
-| RIG_REQ_NOTE | Request notes | NULL | No |
-| RIG_NOTE_STAMPA | Print notes | NULL | No |
-| RIG_HOSTCAUS | Host cause | NULL | No |
-| RIG_HOSTRIF | Host reference | NULL | No |
+| RIG_ORDINE | order_number | Order number reference | Yes |
+| RIG_ARTICOLO | item_code | Item/SKU code | Yes |
+| RIG_QTAR | quantity | Requested quantity | Yes |
+| RIG_SUB1 | sub1 | Optional sub field | No |
+| RIG_SUB2 | sub2 | Optional sub field | No |
 
 ---
 
-# Notes
+## Order Export: `CFG-EXP-ORDINI.xml`
 
-- Orders contain multiple line items
-- `IMP_ORDINI` acts as the order header
-- `IMP_ORDINI_RIGHE` contains order details
-- Empty XML tags represent optional fields
-- `ORD_TIPOOP = P` likely indicates Picking operation
+Root node: `SYSTORE`  
+Header node: `EXP_ORDINI`  
+Line node: `EXP_ORDINI_RIGHE`
 
-# Parsing Considerations
+### Header Fields
 
-## Items
-- Flat structure
-- One XML node per item
-- Minimal nesting
+| WMS Field | Internal Field | Description | Required |
+|---|---|---|---|
+| ORD_ORDINE | order_number | Order number | Yes |
+| ORD_TIPOOP | operation_type | Operation type | Yes |
+| ORD_ATTR1 | warehouse_number | Warehouse number or warehouse reference | No |
+| ORD_ELEBAIE | bay_number | Bay number | No |
 
-## Orders
-- Nested structure
-- Header/detail relationship
-- Multiple order lines per order
-- Requires hierarchical parsing
+### Line Fields
+
+| WMS Field | Internal Field | Description | Required |
+|---|---|---|---|
+| RIG_ORDINE | order_number | Order number reference | Yes |
+| RIG_ARTICOLO | item_code | Item/SKU code | Yes |
+| RIG_SUB1 | sub1 | Batch or sub field | No |
+| RIG_ATTR1 | warehouse_task | Warehouse task | No |
+| RIG_ATTR2 | source_bin | Source storage bin | No |
+| RIG_ATTR3 | destination_bin | Destination storage bin | No |
+| RIG_QTAE | quantity | Executed/exported quantity | Yes |

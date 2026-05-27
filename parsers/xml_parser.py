@@ -42,7 +42,6 @@ def parse_orders(file_path: str):
 
     for order_node in root.findall("IMP_ORDINI"):
         order_number = clean_text(order_node.findtext("ORD_ORDINE"))
-
         lines = []
 
         for line_node in order_node.findall("IMP_ORDINI_RIGHE"):
@@ -64,6 +63,7 @@ def parse_orders(file_path: str):
         orders.append(order)
 
     return orders
+
 
 def parse_export_orders(file_path: str):
     root = parse_xml_file(file_path)
@@ -98,10 +98,11 @@ def parse_export_orders(file_path: str):
 
 if __name__ == "__main__":
     items = parse_items("data/sample_files/CFG-IMP-ARTICOLI.xml")
-    orders = parse_orders("data/sample_files/CFG-IMP-ORDINI.xml")
+    import_orders = parse_orders("data/sample_files/CFG-IMP-ORDINI.xml")
+    export_orders = parse_export_orders("data/sample_files/CFG-EXP-ORDINI.xml")
 
     item_errors = validate_items(items)
-    order_errors = validate_orders(orders)
+    order_errors = validate_orders(import_orders)
 
     print("\nITEMS")
     for item in items:
@@ -110,15 +111,13 @@ if __name__ == "__main__":
     print("\nITEM VALIDATION")
     print(item_errors if item_errors else "No item validation errors")
 
-    print("\nORDERS")
-    for order in orders:
+    print("\nIMPORT ORDERS")
+    for order in import_orders:
+        print(order)
+
+    print("\nEXPORT ORDERS")
+    for order in export_orders:
         print(order)
 
     print("\nORDER VALIDATION")
     print(order_errors if order_errors else "No order validation errors")
-
-    export_orders = parse_export_orders("data/sample_files/CFG-EXP-ORDINI.xml")
-
-print("\nEXPORT ORDERS")
-for order in export_orders:
-    print(order)

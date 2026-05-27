@@ -68,3 +68,35 @@ if __name__ == "__main__":
 
     for order in orders:
         print(order)
+
+def parse_erp_orders_csv(header_file_path: str, line_file_path: str):
+    header_df = pd.read_csv(header_file_path)
+    line_df = pd.read_csv(line_file_path)
+
+    orders = []
+
+    for _, header in header_df.iterrows():
+        order_number = header["sales_order_id"]
+        matching_lines = line_df[line_df["sales_order_id"] == order_number]
+
+        lines = []
+
+        for _, row in matching_lines.iterrows():
+            lines.append(
+                WMSOrderLine(
+                    order_number=order_number,
+                    item_code=row["product_sku"],
+                    quantity=float(row["ordered_qty"]),
+                )
+            )
+
+        orders.append(
+            WMSOrder(
+                order_number=order_number,
+                description=f"{header['customer_name']} - {header['requested_ship_date']}",
+                operation_type="P",
+                lines=lines,
+            )
+        )
+
+    return orders

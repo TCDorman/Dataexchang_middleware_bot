@@ -4,83 +4,66 @@ import pandas as pd
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
-from models.wms_models import WMSItem
+from models.wms_models import WMSItem, WMSOrder, WMSOrderLine
 
 
 def parse_customer_inventory_csv(file_path: str):
     df = pd.read_csv(file_path)
-
     items = []
 
     for _, row in df.iterrows():
-        item = WMSItem(
-            item_code=row["sku"],
-            description=row["description"]
+        items.append(
+            WMSItem(
+                item_code=row["sku"],
+                description=row["description"],
+            )
         )
-
-        items.append(item)
 
     return items
 
 
-if __name__ == "__main__":
-    items = parse_customer_inventory_csv(
-        "data/sample_files/customer_inventory.csv"
-    )
-
-    for item in items:
-        print(item)
-
-from models.wms_models import WMSOrder, WMSOrderLine
-
-
-def parse_customer_orders_csv(file_path: str):
-    df = pd.read_csv(file_path)
-
-    grouped_orders = {}
-
-    for _, row in df.iterrows():
-        order_number = row["order_number"]
-
-        if order_number not in grouped_orders:
-            grouped_orders[order_number] = []
-
-        line = WMSOrderLine(
-            order_number=order_number,
-            item_code=row["item_code"],
-            quantity=float(row["quantity"]),
-        )
-
-        grouped_orders[order_number].append(line)
+def parse_customer_orders_csv(header_file_path: str, line_file_path: str):
+    header_df = pd.read_csv(header_file_path)
+    line_df = pd.read_csv(line_file_path)
 
     orders = []
 
-    for order_number, lines in grouped_orders.items():
-        order = WMSOrder(
-            order_number=order_number,
-            description=f"Customer Order {order_number}",
-            operation_type="P",
-            lines=lines,
-        )
+    for _, header in header_df.iterrows():
+        order_number = header["ORD_ORDINE"]
+        matching_lines = line_df[line_df["RIG_ORDINE"] == order_number]
 
-        orders.append(order)
+        lines = []
+
+        for _, row in matching_lines.iterrows():
+            lines.append(
+                WMSOrderLine(
+                    order_number=row["RIG_ORDINE"],
+                    item_code=row["RIG_ARTICOLO"],
+                    quantity=float(row["RIG_QTAR"]),
+                )
+            )
+
+        orders.append(
+            WMSOrder(
+                order_number=order_number,
+                description=header["ORD_DES"],
+                operation_type=header["ORD_TIPOOP"],
+                lines=lines,
+            )
+        )
 
     return orders
 
+
 if __name__ == "__main__":
-
     print("\nCUSTOMER INVENTORY")
-    inventory_items = parse_customer_inventory_csv(
-        "data/sample_files/customer_inventory.csv"
-    )
-
-    for item in inventory_items:
+    for item in parse_customer_inventory_csv("data/sample_files/customer_inventory.csv"):
         print(item)
 
     print("\nCUSTOMER ORDERS")
-
     orders = parse_customer_orders_csv(
-        "data/sample_files/customer_orders.csv"
+        "data/sample_files/customer_order_headers.csv",
+        "data/sample_files/customer_order_lines.csv",
     )
 
     for order in orders:

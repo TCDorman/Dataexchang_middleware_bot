@@ -1,0 +1,30 @@
+{
+  "orders": [
+    {
+      "order_number": "ORDER11",
+      "description": "ORDER 11",
+      "operation_type": "P",
+      "lines": [
+        {
+          "item_code": "ITEM01",
+          "quantity": 2
+        },
+        {
+          "item_code": "ITEM02",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "order_number": "ORDER12",
+      "description": "ORDER 12",
+      "operation_type": "P",
+      "lines": [
+        {
+          "item_code": "ITEM03",
+          "quantity": 2
+        }
+      ]
+    }
+  ]
+}

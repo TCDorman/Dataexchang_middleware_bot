@@ -1,7 +1,14 @@
+import sys
+from pathlib import Path
 import os
 import json
+
+sys.path.append(str(Path(__file__).resolve().parents[1]))
+
 from dotenv import load_dotenv
 from openai import OpenAI
+
+from models.mapping_models import MappingResponse
 
 load_dotenv()
 
@@ -10,36 +17,58 @@ client = OpenAI(
 )
 
 
+KNOWN_WMS_FIELDS = [
+    {
+        "wms_field": "ORD_ORDINE",
+        "internal_field": "order_number",
+        "description": "Order number"
+    },
+    {
+        "wms_field": "ORD_DES",
+        "internal_field": "description",
+        "description": "Order description"
+    },
+    {
+        "wms_field": "ORD_TIPOOP",
+        "internal_field": "operation_type",
+        "description": "Operation type"
+    },
+    {
+        "wms_field": "RIG_ARTICOLO",
+        "internal_field": "item_code",
+        "description": "Item/SKU code"
+    },
+    {
+        "wms_field": "RIG_QTAR",
+        "internal_field": "quantity",
+        "description": "Requested quantity"
+    }
+]
+
+
 def suggest_wms_mappings(source_fields: list[str]):
+
     prompt = f"""
-You are a Modula WMS integration assistant.
+You are an ERP to WMS integration expert.
 
-Given these customer ERP field names:
-
+Customer ERP fields:
 {source_fields}
 
-Map them to the most likely Modula WMS fields.
+Known Modula WMS fields:
+{json.dumps(KNOWN_WMS_FIELDS, indent=4)}
 
-Available WMS fields:
-- ART_ARTICOLO: item code / SKU
-- ART_DES: item description
-- ORD_ORDINE: order number
-- ORD_DES: order description
-- ORD_TIPOOP: operation type
-- RIG_ORDINE: order number reference
-- RIG_ARTICOLO: item code on order line
-- RIG_QTAR: requested quantity
+Determine the best mapping between the customer fields and WMS fields.
 
-Return ONLY valid JSON in this exact format:
+Return ONLY valid JSON in this format:
 
 {{
     "mappings": [
         {{
-            "source_field": "source field name",
-            "suggested_wms_field": "WMS field name",
-            "internal_field": "normalized internal field",
+            "source_field": "customer field",
+            "suggested_wms_field": "WMS field",
+            "internal_field": "internal normalized field",
             "confidence": 0.95,
-            "reason": "short reason"
+            "reason": "brief explanation"
         }}
     ]
 }}
@@ -50,7 +79,7 @@ Return ONLY valid JSON in this exact format:
         messages=[
             {
                 "role": "system",
-                "content": "You are an expert in ERP to WMS field mapping."
+                "content": "You are an expert ERP integration architect."
             },
             {
                 "role": "user",
@@ -62,22 +91,31 @@ Return ONLY valid JSON in this exact format:
 
     content = response.choices[0].message.content
 
-    # Remove optional markdown code fences if the model returns them
-    content = content.replace("```json", "").replace("```", "").strip()
+    content = (
+        content
+        .replace("```json", "")
+        .replace("```", "")
+        .strip()
+    )
 
-    return json.loads(content)
+    parsed = json.loads(content)
+
+    return MappingResponse(**parsed)
 
 
 if __name__ == "__main__":
+
     sample_fields = [
         "client_order_ref",
         "company_name",
         "process_type",
         "material_code",
-        "requested_quantity"
+        "requested_quantity",
     ]
 
     result = suggest_wms_mappings(sample_fields)
 
-    print("\nLLM MAPPING SUGGESTIONS")
-    print(json.dumps(result, indent=4))
+    print("\nAI FIELD MAPPINGS\n")
+
+    for mapping in result.mappings:
+        print(mapping)

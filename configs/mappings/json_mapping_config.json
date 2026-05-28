@@ -1,0 +1,32 @@
+{
+    "orders.order_id": {
+        "internal_field": "order_number",
+        "wms_field": "ORD_ORDINE",
+        "confidence": 0.98,
+        "reason": "orders.order_id clearly represents the order number matching WMS order_number field"
+    },
+    "orders.description": {
+        "internal_field": "description",
+        "wms_field": "ORD_DES",
+        "confidence": 0.95,
+        "reason": "orders.description directly corresponds to order description in WMS"
+    },
+    "orders.operation_type": {
+        "internal_field": "operation_type",
+        "wms_field": "ORD_TIPOOP",
+        "confidence": 0.95,
+        "reason": "orders.operation_type matches WMS operation_type field"
+    },
+    "orders.lines.sku": {
+        "internal_field": "item_code",
+        "wms_field": "RIG_ARTICOLO",
+        "confidence": 0.97,
+        "reason": "orders.lines.sku corresponds to item/SKU code in WMS"
+    },
+    "orders.lines.quantity": {
+        "internal_field": "quantity",
+        "wms_field": "RIG_QTAR",
+        "confidence": 0.97,
+        "reason": "orders.lines.quantity matches requested quantity in WMS"
+    }
+}

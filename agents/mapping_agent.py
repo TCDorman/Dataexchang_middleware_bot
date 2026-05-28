@@ -10,24 +10,36 @@ client = OpenAI(
 )
 
 
-def suggest_wms_mappings(fields):
+def suggest_wms_mappings(source_fields: list[str]):
     prompt = f"""
 You are a Modula WMS integration assistant.
 
 Given these customer ERP field names:
 
-{fields}
+{source_fields}
 
-Suggest the most likely Modula WMS mappings.
+Map them to the most likely Modula WMS fields.
 
-Return ONLY valid JSON in this format:
+Available WMS fields:
+- ART_ARTICOLO: item code / SKU
+- ART_DES: item description
+- ORD_ORDINE: order number
+- ORD_DES: order description
+- ORD_TIPOOP: operation type
+- RIG_ORDINE: order number reference
+- RIG_ARTICOLO: item code on order line
+- RIG_QTAR: requested quantity
+
+Return ONLY valid JSON in this exact format:
 
 {{
     "mappings": [
         {{
-            "source_field": "sku",
-            "suggested_wms_field": "ART_ARTICOLO",
-            "confidence": 0.98
+            "source_field": "source field name",
+            "suggested_wms_field": "WMS field name",
+            "internal_field": "normalized internal field",
+            "confidence": 0.95,
+            "reason": "short reason"
         }}
     ]
 }}
@@ -38,7 +50,7 @@ Return ONLY valid JSON in this format:
         messages=[
             {
                 "role": "system",
-                "content": "You are a WMS integration expert."
+                "content": "You are an expert in ERP to WMS field mapping."
             },
             {
                 "role": "user",
@@ -48,19 +60,24 @@ Return ONLY valid JSON in this format:
         temperature=0
     )
 
-    return response.choices[0].message.content
+    content = response.choices[0].message.content
+
+    # Remove optional markdown code fences if the model returns them
+    content = content.replace("```json", "").replace("```", "").strip()
+
+    return json.loads(content)
 
 
 if __name__ == "__main__":
     sample_fields = [
-        "sku",
-        "description",
-        "quantity",
-        "order_number",
-        "item_code"
+        "client_order_ref",
+        "company_name",
+        "process_type",
+        "material_code",
+        "requested_quantity"
     ]
 
     result = suggest_wms_mappings(sample_fields)
 
     print("\nLLM MAPPING SUGGESTIONS")
-    print(result)
+    print(json.dumps(result, indent=4))

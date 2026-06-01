@@ -1,0 +1,37 @@
+{
+    "client_order_ref": {
+        "internal_field": "order_number",
+        "wms_field": "ORD_ORDINE",
+        "confidence": 0.95,
+        "reason": "client_order_ref clearly corresponds to order number in WMS",
+        "approved": true
+    },
+    "company_name": {
+        "internal_field": "description",
+        "wms_field": "ORD_DES",
+        "confidence": 0.7,
+        "reason": "company_name can be used as order description, though not a perfect match",
+        "approved": true
+    },
+    "process_type": {
+        "internal_field": "operation_type",
+        "wms_field": "ORD_TIPOOP",
+        "confidence": 0.9,
+        "reason": "process_type aligns well with operation_type in WMS",
+        "approved": true
+    },
+    "material_code": {
+        "internal_field": "item_code",
+        "wms_field": "RIG_ARTICOLO",
+        "confidence": 0.95,
+        "reason": "material_code directly matches item_code in WMS",
+        "approved": true
+    },
+    "requested_quantity": {
+        "internal_field": "quantity",
+        "wms_field": "RIG_QTAR",
+        "confidence": 0.95,
+        "reason": "requested_quantity clearly corresponds to quantity in WMS",
+        "approved": true
+    }
+}

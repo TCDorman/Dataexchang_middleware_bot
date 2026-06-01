@@ -3,13 +3,13 @@
         "internal_field": "order_number",
         "wms_field": "ORD_ORDINE",
         "confidence": 0.95,
-        "reason": "client_order_ref clearly represents the order number, matching WMS order_number field"
+        "reason": "client_order_ref clearly corresponds to order number in WMS"
     },
     "company_name": {
         "internal_field": "description",
         "wms_field": "ORD_DES",
         "confidence": 0.7,
-        "reason": "company_name can be used as order description if no better description is available"
+        "reason": "company_name can be used as order description, though not a perfect match"
     },
     "process_type": {
         "internal_field": "operation_type",
@@ -21,12 +21,12 @@
         "internal_field": "item_code",
         "wms_field": "RIG_ARTICOLO",
         "confidence": 0.95,
-        "reason": "material_code directly corresponds to item_code in WMS"
+        "reason": "material_code directly matches item_code in WMS"
     },
     "requested_quantity": {
         "internal_field": "quantity",
         "wms_field": "RIG_QTAR",
         "confidence": 0.95,
-        "reason": "requested_quantity clearly matches quantity field in WMS"
+        "reason": "requested_quantity clearly corresponds to quantity in WMS"
     }
 }

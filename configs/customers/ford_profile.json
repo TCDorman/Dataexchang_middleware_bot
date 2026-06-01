@@ -1,0 +1,11 @@
+{
+    "customer_name": "Ford",
+    "source_type": "csv",
+    "approved_mapping_path": "configs\\mappings\\approved_agent_csv_mapping.json",
+    "output_format": "wms_xml",
+    "created_at": "2026-06-01T15:58:39.411787",
+    "last_successful_run": {
+        "timestamp": "2026-06-01T17:21:34.160873",
+        "output_path": "data/output/profile_csv_output.xml"
+    }
+}

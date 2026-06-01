@@ -5,9 +5,11 @@ sys.path.append(str(Path(__file__).resolve().parents[1]))
 
 from tools.tool_registry import TOOLS
 
+
 def process_csv_files(
     header_file_path: str,
     line_file_path: str,
+    customer_name: str = "Test CSV Customer",
 ):
     print(
         f"\nProcessing CSV files:\n"
@@ -15,81 +17,70 @@ def process_csv_files(
         f"Lines: {line_file_path}"
     )
 
-    # Detect schemas
-    header_schema = TOOLS["detect_csv_schema"](
-        header_file_path
-    )
+    header_schema = TOOLS["detect_csv_schema"](header_file_path)
+    line_schema = TOOLS["detect_csv_schema"](line_file_path)
 
-    line_schema = TOOLS["detect_csv_schema"](
-        line_file_path
-    )
-
-    all_fields = (
-        header_schema["fields"]
-        + line_schema["fields"]
-    )
+    all_fields = header_schema["fields"] + line_schema["fields"]
 
     print("\nDetected Fields:")
-
     for field in all_fields:
         print(f"  - {field}")
 
-    # Generate mapping
-    mapping_result = TOOLS[
-        "generate_mapping_from_fields"
-    ](all_fields)
+    mapping_result = TOOLS["generate_mapping_from_fields"](all_fields)
 
-    # Save mapping
-    mapping_path = (
-        "configs/mappings/"
-        "agent_csv_mapping.json"
-    )
+    mapping_path = "configs/mappings/agent_csv_mapping.json"
+    TOOLS["save_mapping_config"](mapping_result, mapping_path)
 
-    TOOLS["save_mapping_config"](
+    approved_mapping_path = "configs/mappings/approved_agent_csv_mapping.json"
+    approval_result = TOOLS["save_approved_mapping"](
         mapping_result,
-        mapping_path,
+        approved_mapping_path,
     )
 
-    print(
-        f"\nSaved Mapping:\n"
-        f"{mapping_path}"
-    )
+    print(f"\nSaved Mapping:\n{mapping_path}")
+    print(f"\nSaved Approved Mapping:\n{approval_result['approved_mapping_path']}")
 
-    # Convert
-    conversion_result = TOOLS[
-        "convert_csv_to_wms_xml"
-    ](
+    conversion_result = TOOLS["convert_csv_to_wms_xml"](
         header_file_path,
         line_file_path,
         "data/output/agent_csv_output.xml",
     )
 
-    print(
-        f"\nConverted:\n"
-        f"{conversion_result['output_path']}"
-    )
+    print(f"\nConverted:\n{conversion_result['output_path']}")
 
-    # Validate
-    validation_result = TOOLS[
-        "validate_wms_xml_file"
-    ](
+    validation_result = TOOLS["validate_wms_xml_file"](
         conversion_result["output_path"]
     )
 
-    print(
-        "\nValidation:"
+    print("\nValidation:")
+    print(validation_result)
+
+    profile_result = TOOLS["create_customer_profile"](
+        customer_name=customer_name,
+        source_type="csv",
+        approved_mapping_path=approval_result["approved_mapping_path"],
     )
 
-    print(validation_result)
+    TOOLS["update_last_successful_run"](
+        profile_result["profile_path"],
+        conversion_result["output_path"],
+    )
 
     return {
         "header_schema": header_schema,
         "line_schema": line_schema,
         "mapping_file": mapping_path,
+        "approved_mapping_file": approval_result["approved_mapping_path"],
         "conversion": conversion_result,
         "validation": validation_result,
+        "customer_profile": profile_result,
     }
-def process_json_file(file_path: str):
+
+
+def process_json_file(
+    file_path: str,
+    customer_name: str = "Test JSON Customer",
+):
     print(f"\nProcessing JSON file: {file_path}")
 
     schema = TOOLS["detect_schema"](file_path)
@@ -99,10 +90,12 @@ def process_json_file(file_path: str):
     )
 
     mapping_path = "configs/mappings/agent_json_mapping.json"
+    TOOLS["save_mapping_config"](mapping_result, mapping_path)
 
-    TOOLS["save_mapping_config"](
+    approved_mapping_path = "configs/mappings/approved_agent_json_mapping.json"
+    approval_result = TOOLS["save_approved_mapping"](
         mapping_result,
-        mapping_path,
+        approved_mapping_path,
     )
 
     conversion_result = TOOLS["convert_json_to_wms_xml"](
@@ -114,18 +107,33 @@ def process_json_file(file_path: str):
         conversion_result["output_path"]
     )
 
+    profile_result = TOOLS["create_customer_profile"](
+        customer_name=customer_name,
+        source_type="json",
+        approved_mapping_path=approval_result["approved_mapping_path"],
+    )
+
+    TOOLS["update_last_successful_run"](
+        profile_result["profile_path"],
+        conversion_result["output_path"],
+    )
+
     return {
         "schema": schema,
         "mapping_file": mapping_path,
+        "approved_mapping_file": approval_result["approved_mapping_path"],
         "conversion": conversion_result,
         "validation": validation_result,
+        "customer_profile": profile_result,
     }
+
+
 if __name__ == "__main__":
     result = process_csv_files(
         "data/sample_files/test_ui_headers.csv",
         "data/sample_files/test_ui_lines.csv",
+        customer_name="Test CSV Customer",
     )
 
     print("\nFinal Result:")
     print(result)
-    

@@ -34,6 +34,12 @@ from tools.customer_profile_tools import (
 from tools.profile_conversion_tools import (
     convert_existing_customer_files,
 )
+from tools.export_tools import convert_wms_export_to_customer_csv
+
+from tools.audit_tools import (
+    write_audit_log,
+    read_audit_log,
+)
 TOOLS = {
     "convert_csv_to_wms_xml": convert_csv_to_wms_xml,
     "convert_json_to_wms_xml": convert_json_to_wms_xml,
@@ -51,4 +57,7 @@ TOOLS = {
     "load_customer_profile": load_customer_profile,
     "update_last_successful_run": update_last_successful_run,
     "convert_existing_customer_files": convert_existing_customer_files,
+    "convert_wms_export_to_customer_csv": convert_wms_export_to_customer_csv,
+    "write_audit_log": write_audit_log,
+    "read_audit_log": read_audit_log,
 }

@@ -1,3 +1,3 @@
-po_num,buyer,fulfillment_mode,needed_by,plant
-WV-8801,Horizon Fabrication,PICK,2026-07-01,PLANT-A
-WV-8802,Metro Controls,PICK,2026-07-02,PLANT-B
+client_order_ref,company_name,process_type,target_ship_date,warehouse_region
+ALPHA-7001,Apex Manufacturing,PICK,2026-08-01,EAST
+ALPHA-7002,Blue River Systems,PICK,2026-08-03,WEST

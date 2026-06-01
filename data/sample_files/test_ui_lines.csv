@@ -1,5 +1,5 @@
-po_ref,part_no,item_name,qty_requested,zone
-WV-8801,BRACKET-10,Mounting Bracket,9,Z1
-WV-8801,BOLT-22,Hex Bolt,40,Z2
-WV-8802,RELAY-90,Control Relay,6,Z3
-WV-8802,FUSE-15,Mini Fuse,25,Z4
+client_order_ref,material_code,material_description,requested_quantity,staging_lane
+ALPHA-7001,MTR-100,Drive Motor,5,LANE-1
+ALPHA-7001,BRG-200,Sealed Bearing,12,LANE-1
+ALPHA-7002,SNS-300,Optical Sensor,8,LANE-2
+ALPHA-7002,CBL-400,Control Cable,20,LANE-2

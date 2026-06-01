@@ -59,6 +59,11 @@ Known Modula WMS fields:
 
 Determine the best mapping between the customer fields and WMS fields.
 
+Important:
+- Only return mappings for fields that clearly match a known WMS field.
+- Do not return null values.
+- Ignore fields that are not useful for WMS import.
+
 Return ONLY valid JSON in this format:
 
 {{
@@ -99,6 +104,18 @@ Return ONLY valid JSON in this format:
     )
 
     parsed = json.loads(content)
+
+    valid_mappings = []
+
+    for mapping in parsed.get("mappings", []):
+        if (
+            mapping.get("source_field")
+            and mapping.get("suggested_wms_field")
+            and mapping.get("internal_field")
+        ):
+            valid_mappings.append(mapping)
+
+    parsed["mappings"] = valid_mappings
 
     return MappingResponse(**parsed)
 

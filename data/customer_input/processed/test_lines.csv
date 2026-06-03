@@ -1,0 +1,5 @@
+client_order_ref,material_code,material_description,requested_quantity,staging_lane
+FORD-1001,AXLE-100,Rear Axle Assembly,5,A1
+FORD-1001,BOLT-22,Hex Bolt,50,A1
+FORD-1002,SENSOR-88,Temperature Sensor,10,B2
+FORD-1002,WIRE-18AWG,Electrical Wire,3,B2

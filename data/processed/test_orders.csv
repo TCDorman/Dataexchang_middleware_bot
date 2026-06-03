@@ -1,0 +1,4 @@
+order_id,customer_name,item,quantity
+ORD-1001,Ford,ABC123,5
+ORD-1001,Ford,XYZ789,2
+ORD-1002,Ford,LMN456,10

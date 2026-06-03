@@ -1,0 +1,8 @@
+{
+    "wms_import_folder": "data/wms_import",
+    "wms_export_folder": "data/wms_export",
+    "customer_input_folder": "data/customer_input",
+    "customer_output_folder": "data/customer_output",
+    "default_output_format": "csv",
+    "enable_audit_logging": true
+}

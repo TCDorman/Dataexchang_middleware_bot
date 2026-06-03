@@ -1,0 +1,27 @@
+{
+    "customer_name": "Unknown Customer",
+    "header_signature": [
+        "ORDER_REF",
+        "CLIENT_ORG",
+        "PRODUCT_ID",
+        "UNITS_REQUESTED"
+    ],
+    "field_mapping": {
+        "ORDER_REF": "order_id",
+        "CLIENT_ORG": "customer_name",
+        "PRODUCT_ID": "item",
+        "UNITS_REQUESTED": "quantity"
+    },
+    "mapping_confidence": {
+        "ORDER_REF": 95,
+        "CLIENT_ORG": 90,
+        "PRODUCT_ID": 95,
+        "UNITS_REQUESTED": 90
+    },
+    "mapping_notes": {
+        "ORDER_REF": "Typically represents an order reference ID.",
+        "CLIENT_ORG": "Likely represents the customer organization or name.",
+        "PRODUCT_ID": "Usually refers to the item or product identification.",
+        "UNITS_REQUESTED": "Indicates the quantity requested."
+    }
+}

@@ -1,0 +1,27 @@
+{
+    "customer_name": "Unknown Customer",
+    "header_signature": [
+        "order_id",
+        "customer_name",
+        "item",
+        "quantity"
+    ],
+    "field_mapping": {
+        "order_id": "order_id",
+        "customer_name": "customer_name",
+        "item": "item",
+        "quantity": "quantity"
+    },
+    "mapping_confidence": {
+        "order_id": 100,
+        "customer_name": 100,
+        "item": 100,
+        "quantity": 100
+    },
+    "mapping_notes": {
+        "order_id": "Exact match with internal schema field 'order_id'.",
+        "customer_name": "Exact match with internal schema field 'customer_name'.",
+        "item": "Exact match with internal schema field 'item'.",
+        "quantity": "Exact match with internal schema field 'quantity'."
+    }
+}

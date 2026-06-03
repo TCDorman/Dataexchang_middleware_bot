@@ -1,0 +1,17 @@
+{
+    "customer_name": "Ford",
+
+    "header_signature": [
+        "Order Number",
+        "Customer",
+        "Part",
+        "Qty"
+    ],
+
+    "field_mapping": {
+        "Order Number": "order_id",
+        "Customer": "customer_name",
+        "Part": "item",
+        "Qty": "quantity"
+    }
+}

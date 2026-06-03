@@ -1,0 +1,4 @@
+Order Number,Customer,Part,Qty
+ORD-2001,Ford,ABC123,5
+ORD-2001,Ford,XYZ789,2
+ORD-2002,Ford,LMN456,10

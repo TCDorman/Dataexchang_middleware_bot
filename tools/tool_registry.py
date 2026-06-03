@@ -40,6 +40,11 @@ from tools.audit_tools import (
     write_audit_log,
     read_audit_log,
 )
+from tools.config_tools import (
+    load_local_settings,
+    get_setting,
+)
+
 TOOLS = {
     "convert_csv_to_wms_xml": convert_csv_to_wms_xml,
     "convert_json_to_wms_xml": convert_json_to_wms_xml,
@@ -60,4 +65,6 @@ TOOLS = {
     "convert_wms_export_to_customer_csv": convert_wms_export_to_customer_csv,
     "write_audit_log": write_audit_log,
     "read_audit_log": read_audit_log,
+    "load_local_settings": load_local_settings,
+    "get_setting": get_setting,
 }

@@ -5,7 +5,7 @@
     "output_format": "wms_xml",
     "created_at": "2026-06-04T15:44:56.429785",
     "last_successful_run": {
-        "timestamp": "2026-06-04T15:45:48.395444",
+        "timestamp": "2026-06-04T17:34:59.122263",
         "output_path": "data/output/profile_csv_output.xml"
     }
 }

@@ -1,0 +1,17 @@
+{
+    "customer_name": "ACME",
+
+    "header_signature": [
+        "PO",
+        "Client",
+        "SKU",
+        "Amount"
+    ],
+
+    "field_mapping": {
+        "PO": "order_id",
+        "Client": "customer_name",
+        "SKU": "item",
+        "Amount": "quantity"
+    }
+}

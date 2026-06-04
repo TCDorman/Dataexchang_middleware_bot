@@ -19,16 +19,33 @@ def parse_customer_inventory_csv(file_path: str):
 
     item_field = find_column(
         df.columns,
-        ["sku", "item_code", "material_code", "part_no", "ART_ARTICOLO"],
+        [
+            "item",
+            "sku",
+            "item_code",
+            "material_code",
+            "part_no",
+            "part_number",
+            "product_code",
+            "ART_ARTICOLO",
+        ],
     )
 
     description_field = find_column(
         df.columns,
-        ["description", "item_description", "material_description", "item_name", "ART_DES"],
+        [
+            "description",
+            "item_description",
+            "material_description",
+            "item_name",
+            "ART_DES",
+        ],
     )
 
     if not item_field:
-        raise ValueError(f"Could not detect item field. Columns: {list(df.columns)}")
+        raise ValueError(
+            f"Could not detect item field. Columns: {list(df.columns)}"
+        )
 
     items = []
 
@@ -36,58 +53,114 @@ def parse_customer_inventory_csv(file_path: str):
         items.append(
             WMSItem(
                 item_code=str(row[item_field]),
-                description=str(row[description_field]) if description_field else "",
+                description=str(row[description_field])
+                if description_field
+                else "",
             )
         )
 
     return items
 
 
-def parse_erp_orders_csv(header_file_path: str, line_file_path: str):
+def parse_erp_orders_csv(
+    header_file_path: str,
+    line_file_path: str,
+):
     header_df = pd.read_csv(header_file_path)
     line_df = pd.read_csv(line_file_path)
 
     header_order_field = find_column(
         header_df.columns,
-        ["ORD_ORDINE", "sales_order_id", "order_number", "client_order_ref", "po_num", "order_id"],
+        [
+            "ORD_ORDINE",
+            "sales_order_id",
+            "order_number",
+            "client_order_ref",
+            "po_num",
+            "order_id",
+        ],
     )
 
     description_field = find_column(
         header_df.columns,
-        ["ORD_DES", "customer_name", "description", "company_name", "buyer"],
+        [
+            "ORD_DES",
+            "customer_name",
+            "description",
+            "company_name",
+            "buyer",
+        ],
     )
 
     operation_field = find_column(
         header_df.columns,
-        ["ORD_TIPOOP", "operation_type", "process_type", "fulfillment_mode", "order_type"],
+        [
+            "ORD_TIPOOP",
+            "operation_type",
+            "process_type",
+            "fulfillment_mode",
+            "order_type",
+        ],
     )
 
     line_order_field = find_column(
         line_df.columns,
-        ["RIG_ORDINE", "sales_order_id", "order_number", "client_order_ref", "po_ref", "order_id"],
+        [
+            "RIG_ORDINE",
+            "sales_order_id",
+            "order_number",
+            "client_order_ref",
+            "po_ref",
+            "order_id",
+        ],
     )
 
     item_field = find_column(
         line_df.columns,
-        ["RIG_ARTICOLO", "sku", "item_code", "material_code", "part_no", "product_sku"],
+        [
+            "RIG_ARTICOLO",
+            "item",
+            "sku",
+            "item_code",
+            "material_code",
+            "part_no",
+            "part_number",
+            "product_sku",
+            "product_code",
+        ],
     )
 
     quantity_field = find_column(
         line_df.columns,
-        ["RIG_QTAR", "quantity", "qty", "requested_quantity", "qty_requested", "ordered_qty"],
+        [
+            "RIG_QTAR",
+            "quantity",
+            "qty",
+            "requested_quantity",
+            "qty_requested",
+            "ordered_qty",
+        ],
     )
 
     if not header_order_field:
-        raise ValueError(f"Could not detect header order field. Header columns: {list(header_df.columns)}")
+        raise ValueError(
+            f"Could not detect header order field. Header columns: {list(header_df.columns)}"
+        )
 
     if not line_order_field:
-        raise ValueError(f"Could not detect line order field. Line columns: {list(line_df.columns)}")
+        raise ValueError(
+            f"Could not detect line order field. Line columns: {list(line_df.columns)}"
+        )
 
     if not item_field:
-        raise ValueError(f"Could not detect item field. Line columns: {list(line_df.columns)}")
+        raise ValueError(
+            f"Could not detect item field. Line columns: {list(line_df.columns)}"
+        )
 
     if not quantity_field:
-        raise ValueError(f"Could not detect quantity field. Line columns: {list(line_df.columns)}")
+        raise ValueError(
+            f"Could not detect quantity field. Line columns: {list(line_df.columns)}"
+        )
 
     orders = []
 
@@ -95,7 +168,8 @@ def parse_erp_orders_csv(header_file_path: str, line_file_path: str):
         order_number = str(header[header_order_field])
 
         matching_lines = line_df[
-            line_df[line_order_field].astype(str) == order_number
+            line_df[line_order_field].astype(str)
+            == order_number
         ]
 
         lines = []
@@ -136,8 +210,14 @@ def parse_erp_orders_csv(header_file_path: str, line_file_path: str):
     return orders
 
 
-def parse_customer_orders_csv(header_file_path: str, line_file_path: str):
-    return parse_erp_orders_csv(header_file_path, line_file_path)
+def parse_customer_orders_csv(
+    header_file_path: str,
+    line_file_path: str,
+):
+    return parse_erp_orders_csv(
+        header_file_path,
+        line_file_path,
+    )
 
 
 if __name__ == "__main__":

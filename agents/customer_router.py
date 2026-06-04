@@ -45,16 +45,33 @@ def process_customer_files(
         }
 
     print(
-        f"\nNew customer detected:"
-        f" {customer_name}"
+        f"\nNew customer detected: "
+        f"{customer_name}"
     )
+
+    if not file_paths:
+        raise ValueError(
+            "No input files were provided."
+        )
 
     extensions = [
         Path(file).suffix.lower()
         for file in file_paths
     ]
 
+    # Single CSV file
     if (
+        len(file_paths) == 1
+        and extensions[0] == ".csv"
+    ):
+        result = process_csv_files(
+            file_paths[0],
+            None,
+            customer_name,
+        )
+
+    # Header + Line CSV files
+    elif (
         len(file_paths) == 2
         and all(ext == ".csv" for ext in extensions)
     ):
@@ -64,6 +81,7 @@ def process_customer_files(
             customer_name,
         )
 
+    # Single JSON file
     elif (
         len(file_paths) == 1
         and extensions[0] == ".json"

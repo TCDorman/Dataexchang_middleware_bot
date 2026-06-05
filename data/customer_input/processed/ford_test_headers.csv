@@ -1,3 +1,2 @@
-client_order_ref,company_name,process_type,target_ship_date,warehouse_region
-FORD-1001,Ford Motor Company,P,2026-06-15,DETROIT
-FORD-1002,Ford Motor Company,P,2026-06-16,DETROIT
+PO_NUM,BUYER
+9001,Ford

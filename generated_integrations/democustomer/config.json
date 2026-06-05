@@ -1,0 +1,9 @@
+{
+    "customer_name": "DemoCustomer",
+    "source_type": "csv",
+    "target_system": "Modula WMS",
+    "target_format": "wms_xml",
+    "created_at": "2026-06-05T08:42:05.811331",
+    "input_folder": "data/customer_input",
+    "output_folder": "data/output"
+}

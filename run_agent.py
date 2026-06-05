@@ -1,6 +1,7 @@
 import argparse
 import shutil
 import time
+from datetime import datetime
 from pathlib import Path
 
 from agents.customer_detection_agent import detect_customer_from_files
@@ -11,6 +12,45 @@ from agents.master_agent import (
 )
 
 from agents.history_agent import show_integration_history
+
+
+# ==================================================
+# Logging
+# ==================================================
+def write_log(
+    customer_name: str,
+    status: str,
+    files: list,
+    message: str,
+):
+    """
+    Write a processing event to a daily integration log.
+
+    Logs are stored in:
+    logs/integration_YYYY_MM_DD.log
+    """
+    log_dir = Path("logs")
+    log_dir.mkdir(exist_ok=True)
+
+    log_file = log_dir / f"integration_{datetime.now():%Y_%m_%d}.log"
+
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    log_entry = (
+        f"\n{'=' * 60}\n"
+        f"Timestamp: {timestamp}\n"
+        f"Customer: {customer_name}\n"
+        f"Status: {status}\n"
+        f"Files:\n"
+    )
+
+    for file in files:
+        log_entry += f"  - {file}\n"
+
+    log_entry += f"\nMessage:\n{message}\n"
+
+    with open(log_file, "a", encoding="utf-8") as file:
+        file.write(log_entry)
 
 
 # ==================================================
@@ -74,8 +114,8 @@ def resolve_customer(customer_name, file_paths):
     """
     Determine which customer should be used for processing.
 
-    If the user provided --customer, use it.
-    If not, attempt to detect the customer from the file names.
+    If --customer was provided, use it.
+    Otherwise, detect the customer from the file names.
     """
     if customer_name:
         return customer_name
@@ -124,9 +164,10 @@ def process_folder(customer_name: str | None, input_dir: str):
     1. Find files in the input directory
     2. Group related files if needed
     3. Detect customer if --customer was not provided
-    4. Run the normal customer import workflow
+    4. Run the customer import workflow
     5. Move successful files to processed/
     6. Move failed files to failed/
+    7. Write success/failure logs
     """
     input_path = Path(input_dir)
 
@@ -155,6 +196,8 @@ def process_folder(customer_name: str | None, input_dir: str):
             for file in file_group
         ]
 
+        resolved_customer = customer_name or "UNKNOWN"
+
         try:
             resolved_customer = resolve_customer(
                 customer_name,
@@ -164,6 +207,13 @@ def process_folder(customer_name: str | None, input_dir: str):
             result = run_customer_import(
                 resolved_customer,
                 file_paths,
+            )
+
+            write_log(
+                customer_name=resolved_customer,
+                status="SUCCESS",
+                files=file_paths,
+                message=str(result),
             )
 
             move_files(file_group, processed_dir)
@@ -178,11 +228,18 @@ def process_folder(customer_name: str | None, input_dir: str):
             )
 
         except Exception as error:
+            write_log(
+                customer_name=resolved_customer,
+                status="FAILED",
+                files=file_paths,
+                message=str(error),
+            )
+
             move_files(file_group, failed_dir)
 
             results.append(
                 {
-                    "customer": customer_name,
+                    "customer": resolved_customer,
                     "files": file_paths,
                     "status": "failed",
                     "error": str(error),

@@ -1,0 +1,23 @@
+{
+    "customer_name": "Ford",
+    "schemas": [
+        {
+            "fingerprint": "d137410a2d4a436b7f51014b879fa6783f16e3a2e01d3e61c73003e1113bbb56",
+            "first_seen": "2026-06-04T15:49:29.327424",
+            "last_seen": "2026-06-04T15:49:29.327440",
+            "file_path": "data/customer_input/ford_single_orders.csv",
+            "columns": [
+                "PO_NUM",
+                "BUYER",
+                "PART_NO",
+                "QTY_REQ"
+            ],
+            "normalized_columns": [
+                "buyer",
+                "part_no",
+                "po_num",
+                "qty_req"
+            ]
+        }
+    ]
+}

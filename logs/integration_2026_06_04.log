@@ -1,0 +1,55 @@
+
+============================================================
+Timestamp: 2026-06-04 13:41:19
+Customer: UNKNOWN
+Status: FAILED
+Files:
+  - data\customer_input\pair_headers.csv
+  - data\customer_input\pair_lines.csv
+
+Message:
+Could not detect customer from files: ['data\\customer_input\\pair_headers.csv', 'data\\customer_input\\pair_lines.csv']
+
+============================================================
+Timestamp: 2026-06-04 13:41:42
+Customer: Ford
+Status: SUCCESS
+Files:
+  - data\customer_input\ford_test_headers.csv
+  - data\customer_input\ford_test_lines.csv
+
+Message:
+{'customer_exists': True, 'profile_path': 'configs\\customers\\ford_profile.json', 'result': {'status': 'success', 'profile_path': 'configs\\customers\\ford_profile.json', 'source_type': 'csv', 'conversion': {'status': 'success', 'source_type': 'csv', 'orders_converted': 2, 'output_path': 'data/output/profile_csv_output.xml'}, 'validation': {'status': 'success', 'errors': []}}}
+
+============================================================
+Timestamp: 2026-06-04 14:01:19
+Customer: Ford
+Status: SUCCESS
+Files:
+  - data\customer_input\ford_test_headers.csv
+  - data\customer_input\ford_test_lines.csv
+
+Message:
+{'customer_exists': True, 'profile_path': 'configs\\customers\\ford_profile.json', 'result': {'status': 'success', 'profile_path': 'configs\\customers\\ford_profile.json', 'source_type': 'csv', 'conversion': {'status': 'success', 'source_type': 'csv', 'orders_converted': 2, 'output_path': 'data/output/profile_csv_output.xml'}, 'validation': {'status': 'success', 'errors': []}}}
+
+============================================================
+Timestamp: 2026-06-04 14:02:39
+Customer: Ford
+Status: SUCCESS
+Files:
+  - data\customer_input\ford_test_headers.csv
+  - data\customer_input\ford_test_lines.csv
+
+Message:
+{'customer_exists': True, 'profile_path': 'configs\\customers\\ford_profile.json', 'result': {'status': 'success', 'profile_path': 'configs\\customers\\ford_profile.json', 'source_type': 'csv', 'conversion': {'status': 'success', 'source_type': 'csv', 'orders_converted': 1, 'output_path': 'data/output/profile_csv_output.xml'}, 'validation': {'status': 'success', 'errors': []}}}
+
+============================================================
+Timestamp: 2026-06-04 14:32:46
+Customer: Ford
+Status: SUCCESS
+Files:
+  - data\customer_input\ford_test_headers.csv
+  - data\customer_input\ford_test_lines.csv
+
+Message:
+{'customer_exists': True, 'profile_path': 'configs\\customers\\ford_profile.json', 'result': {'status': 'success', 'profile_path': 'configs\\customers\\ford_profile.json', 'source_type': 'csv', 'conversion': {'status': 'success', 'source_type': 'csv', 'orders_converted': 1, 'output_path': 'data/output/profile_csv_output.xml'}, 'validation': {'status': 'success', 'errors': []}}}

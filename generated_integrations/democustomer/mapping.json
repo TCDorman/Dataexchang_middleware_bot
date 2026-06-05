@@ -1,0 +1,44 @@
+{
+    "data/customer_input/ford_single_orders.csv": {
+        "columns": [
+            "PO_NUM",
+            "BUYER",
+            "PART_NO",
+            "QTY_REQ"
+        ],
+        "mapping": {
+            "order_id": "PO_NUM",
+            "customer_name": "BUYER",
+            "item": "PART_NO",
+            "quantity": "QTY_REQ",
+            "operation_type": null
+        },
+        "confidence": {
+            "order_id": 100,
+            "customer_name": 100,
+            "item": 100,
+            "quantity": 80,
+            "operation_type": 0
+        },
+        "sample_rows": [
+            {
+                "PO_NUM": 9001,
+                "BUYER": "Ford",
+                "PART_NO": "ABC123",
+                "QTY_REQ": 5
+            },
+            {
+                "PO_NUM": 9001,
+                "BUYER": "Ford",
+                "PART_NO": "XYZ789",
+                "QTY_REQ": 2
+            },
+            {
+                "PO_NUM": 9002,
+                "BUYER": "Ford",
+                "PART_NO": "LMN456",
+                "QTY_REQ": 10
+            }
+        ]
+    }
+}

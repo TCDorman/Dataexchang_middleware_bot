@@ -20,6 +20,7 @@ Responsibilities:
 from typing import Any, Dict, List
 
 from src.validation.ai_profile_validator import AIProfileValidator
+from src.validation.business_rule_validator import BusinessRuleValidator
 from src.validation.duplicate_detector import DuplicateDetector
 
 
@@ -39,6 +40,7 @@ class ValidationManager:
 
         self.ai_profile_validator = AIProfileValidator()
         self.duplicate_detector = DuplicateDetector()
+        self.business_rule_validator = BusinessRuleValidator()
 
     def validate_profile(
         self,
@@ -46,13 +48,6 @@ class ValidationManager:
     ) -> Dict:
         """
         Validate an AI-generated customer profile.
-
-        Args:
-            profile:
-                AI-generated profile dictionary.
-
-        Returns:
-            Standard validation result.
         """
 
         result = self.ai_profile_validator.validate_profile(profile)
@@ -71,17 +66,16 @@ class ValidationManager:
     ) -> Dict:
         """
         Validate normalized orders before export.
-
-        Args:
-            orders:
-                List of normalized order objects or dictionaries.
-
-        Returns:
-            Standard validation result.
         """
 
         duplicate_result = self.duplicate_detector.detect_duplicates(
             orders
+        )
+
+        business_rule_result = (
+            self.business_rule_validator.validate_orders(
+                orders
+            )
         )
 
         errors = []
@@ -99,6 +93,14 @@ class ValidationManager:
                 f"{duplicate_result['duplicate_lines']}"
             )
 
+        errors.extend(
+            business_rule_result["errors"]
+        )
+
+        warnings.extend(
+            business_rule_result["warnings"]
+        )
+
         return {
             "validation_type": "orders",
             "is_valid": len(errors) == 0,
@@ -106,5 +108,6 @@ class ValidationManager:
             "warnings": warnings,
             "details": {
                 "duplicate_check": duplicate_result,
+                "business_rule_check": business_rule_result,
             },
         }

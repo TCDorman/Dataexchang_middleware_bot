@@ -28,3 +28,23 @@ Files:
 
 Message:
 {'customer_exists': True, 'profile_path': 'configs\\customers\\ford_profile.json', 'result': {'status': 'success', 'profile_path': 'configs\\customers\\ford_profile.json', 'source_type': 'csv', 'conversion': {'status': 'success', 'source_type': 'csv', 'orders_converted': 3, 'duplicate_check': {'has_duplicates': False, 'duplicate_order_ids': [], 'duplicate_lines': [], 'summary': {'orders_checked': 3, 'duplicate_order_id_count': 0, 'duplicate_line_count': 0}}, 'output_path': 'data/output/profile_csv_output.xml'}, 'validation': {'status': 'success', 'errors': []}, 'schema_fingerprints': [{'status': 'known_schema', 'registry_path': 'configs\\schema_fingerprints\\ford_schemas.json', 'schema': {'fingerprint': 'd137410a2d4a436b7f51014b879fa6783f16e3a2e01d3e61c73003e1113bbb56', 'first_seen': '2026-06-04T15:49:29.327424', 'last_seen': '2026-06-04T15:49:29.327440', 'file_path': 'data/customer_input/ford_single_orders.csv', 'columns': ['PO_NUM', 'BUYER', 'PART_NO', 'QTY_REQ'], 'normalized_columns': ['buyer', 'part_no', 'po_num', 'qty_req']}}]}}
+
+============================================================
+Timestamp: 2026-06-08 10:33:42
+Customer: Ford
+Status: FAILED
+Files:
+  - data\customer_input\ford_single_orders.csv
+
+Message:
+Order validation failed: ['Order at index 0 is missing order_id.', "Order 'None', line 0 is missing item.", "Order 'None', line 1 is missing item.", 'Order at index 1 is missing order_id.', "Order 'None', line 0 is missing item.", "Order 'None', line 1 is missing item.", 'Order at index 2 is missing order_id.', "Order 'None', line 0 is missing item."]
+
+============================================================
+Timestamp: 2026-06-08 11:18:54
+Customer: Ford
+Status: SUCCESS
+Files:
+  - data\customer_input\ford_single_orders.csv
+
+Message:
+{'customer_exists': True, 'profile_path': 'configs\\customers\\ford_profile.json', 'result': {'status': 'success', 'profile_path': 'configs\\customers\\ford_profile.json', 'source_type': 'csv', 'conversion': {'status': 'success', 'source_type': 'csv', 'orders_converted': 3, 'validation_result': {'validation_type': 'orders', 'is_valid': True, 'errors': [], 'warnings': [], 'details': {'duplicate_check': {'has_duplicates': False, 'duplicate_order_ids': [], 'duplicate_lines': [], 'summary': {'orders_checked': 3, 'duplicate_order_id_count': 0, 'duplicate_line_count': 0}}, 'business_rule_check': {'is_valid': True, 'errors': [], 'warnings': []}}}, 'duplicate_check': {'has_duplicates': False, 'duplicate_order_ids': [], 'duplicate_lines': [], 'summary': {'orders_checked': 3, 'duplicate_order_id_count': 0, 'duplicate_line_count': 0}}, 'business_rule_check': {'is_valid': True, 'errors': [], 'warnings': []}, 'output_path': 'data/output/profile_csv_output.xml'}, 'validation': {'status': 'success', 'errors': []}, 'schema_fingerprints': [{'status': 'known_schema', 'registry_path': 'configs\\schema_fingerprints\\ford_schemas.json', 'schema': {'fingerprint': 'd137410a2d4a436b7f51014b879fa6783f16e3a2e01d3e61c73003e1113bbb56', 'first_seen': '2026-06-04T15:49:29.327424', 'last_seen': '2026-06-04T15:49:29.327440', 'file_path': 'data/customer_input/ford_single_orders.csv', 'columns': ['PO_NUM', 'BUYER', 'PART_NO', 'QTY_REQ'], 'normalized_columns': ['buyer', 'part_no', 'po_num', 'qty_req']}}]}}

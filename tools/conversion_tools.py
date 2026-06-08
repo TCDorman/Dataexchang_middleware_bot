@@ -1,49 +1,67 @@
+"""
+==================================================
+Conversion Tools
+==================================================
+
+Purpose:
+    Converts customer source data into Modula WMS XML.
+
+Responsibilities:
+    - Convert CSV orders to WMS XML
+    - Convert JSON orders to WMS XML
+    - Convert XML orders using mapping logic
+    - Run centralized order validation before export
+"""
+
+# ==================================================
+# Imports
+# ==================================================
+
+import json
 import sys
 from pathlib import Path
-from scripts.convert_xml_with_mapping import convert_xml_with_mapping
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
 from parsers.csv_parser import parse_erp_orders_csv
 from parsers.rest_api_parser import parse_api_orders
-from transformers.wms_xml_transformer import export_orders_to_xml
+from scripts.convert_xml_with_mapping import convert_xml_with_mapping
 from scripts.format_wms_xml import format_wms_xml
-from src.validation.duplicate_detector import DuplicateDetector
-
-import json
+from src.validation.validation_manager import ValidationManager
+from transformers.wms_xml_transformer import export_orders_to_xml
 
 
 # ==================================================
-# Duplicate Validation
+# Order Validation
 # ==================================================
 
-def run_duplicate_check(orders: list):
+def run_order_validation(orders: list):
     """
-    Run duplicate detection before exporting orders.
+    Run centralized order validation before exporting.
 
     Args:
         orders:
             Normalized order list.
 
     Returns:
-        Duplicate detection result.
+        Validation result.
 
     Raises:
         ValueError:
-            If duplicate order IDs are detected.
+            If validation fails.
     """
 
-    detector = DuplicateDetector()
+    validation_manager = ValidationManager()
 
-    duplicate_result = detector.detect_duplicates(orders)
+    validation_result = validation_manager.validate_orders(orders)
 
-    if duplicate_result["duplicate_order_ids"]:
+    if not validation_result["is_valid"]:
         raise ValueError(
-            "Duplicate order IDs detected: "
-            f"{duplicate_result['duplicate_order_ids']}"
+            "Order validation failed: "
+            f"{validation_result['errors']}"
         )
 
-    return duplicate_result
+    return validation_result
 
 
 # ==================================================
@@ -52,7 +70,7 @@ def run_duplicate_check(orders: list):
 
 def convert_csv_to_wms_xml(
     header_file_path: str,
-    line_file_path: str,
+    line_file_path: str | None,
     output_path: str,
 ):
     """
@@ -60,7 +78,7 @@ def convert_csv_to_wms_xml(
 
     Workflow:
     1. Parse CSV orders
-    2. Detect duplicate orders/order lines
+    2. Run centralized order validation
     3. Export orders to XML
     4. Format XML output
     """
@@ -70,7 +88,7 @@ def convert_csv_to_wms_xml(
         line_file_path,
     )
 
-    duplicate_result = run_duplicate_check(orders)
+    validation_result = run_order_validation(orders)
 
     export_orders_to_xml(orders, output_path)
     format_wms_xml(output_path)
@@ -79,7 +97,13 @@ def convert_csv_to_wms_xml(
         "status": "success",
         "source_type": "csv",
         "orders_converted": len(orders),
-        "duplicate_check": duplicate_result,
+        "validation_result": validation_result,
+        "duplicate_check": validation_result["details"][
+            "duplicate_check"
+        ],
+        "business_rule_check": validation_result["details"][
+            "business_rule_check"
+        ],
         "output_path": output_path,
     }
 
@@ -98,7 +122,7 @@ def convert_json_to_wms_xml(
     Workflow:
     1. Load JSON file
     2. Parse JSON into normalized orders
-    3. Detect duplicate orders/order lines
+    3. Run centralized order validation
     4. Export orders to XML
     5. Format XML output
     """
@@ -112,7 +136,7 @@ def convert_json_to_wms_xml(
 
     orders = parse_api_orders(api_data)
 
-    duplicate_result = run_duplicate_check(orders)
+    validation_result = run_order_validation(orders)
 
     export_orders_to_xml(orders, output_path)
     format_wms_xml(output_path)
@@ -121,7 +145,13 @@ def convert_json_to_wms_xml(
         "status": "success",
         "source_type": "json",
         "orders_converted": len(orders),
-        "duplicate_check": duplicate_result,
+        "validation_result": validation_result,
+        "duplicate_check": validation_result["details"][
+            "duplicate_check"
+        ],
+        "business_rule_check": validation_result["details"][
+            "business_rule_check"
+        ],
         "output_path": output_path,
     }
 
@@ -138,9 +168,9 @@ def convert_xml_to_wms_xml(
     Convert customer XML order data into Modula WMS XML.
 
     Note:
-        Duplicate detection is not currently applied here
-        because this function delegates conversion to an
-        XML mapping script.
+        Central order validation is not currently applied here
+        because this function delegates conversion to an XML
+        mapping script.
     """
 
     output_path = "data/output/tool_xml_orders.xml"

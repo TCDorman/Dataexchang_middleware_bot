@@ -1,0 +1,8 @@
+{
+    "customer_name": "demo_erp",
+    "api_config_path": "configs\\rest\\demo_erp_api.json",
+    "orders_endpoint": "/orders",
+    "http_method": "GET",
+    "response_root": "orders",
+    "mapping_file": "mapping.json"
+}

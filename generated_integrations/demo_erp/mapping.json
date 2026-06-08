@@ -18,10 +18,9 @@
         "suggested_mapping": 95
     },
     "notes": [
-        "Authentication requires API key in Authorization header.",
-        "Operation type correlates to 'type' field, values like 'PICK'.",
-        "Quantity is an integer in 'qty' field.",
-        "No explicit environment variable name provided for API key.",
-        "Response root is the 'orders' array."
+        "Authentication uses API key passed in the Authorization header; confirm exact header format with customer.",
+        "The 'type' field maps to Modula WMS operation_type; validate the values supported in WMS.",
+        "Response root 'orders' contains the order list array.",
+        "The sample response aligns well with expected data structures for orders and order lines."
     ]
 }

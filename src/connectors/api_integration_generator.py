@@ -11,7 +11,7 @@ Responsibilities:
     - Generate REST API config
     - Generate mapping JSON
     - Create integration folder
-    - Generate starter files
+    - Generate runnable starter files
     - Return generation results
 """
 
@@ -22,6 +22,10 @@ Responsibilities:
 import json
 from pathlib import Path
 from typing import Dict
+
+from src.connectors.api_runner_generator import (
+    ApiRunnerGenerator,
+)
 
 
 # ==================================================
@@ -39,13 +43,6 @@ class ApiIntegrationGenerator:
     ) -> Dict:
         """
         Generate integration assets from analyzer output.
-
-        Args:
-            analysis_result:
-                Output from ApiDocumentationAnalyzer.
-
-        Returns:
-            Generation result.
         """
 
         customer_name = self._get_safe_customer_name(
@@ -72,14 +69,13 @@ class ApiIntegrationGenerator:
             analysis_result,
         )
 
-        self._generate_runner(
-            integration_folder,
-            customer_name,
-        )
+        runner_generator = ApiRunnerGenerator()
 
-        self._generate_api_client(
-            integration_folder,
-            customer_name,
+        runner_files = runner_generator.generate_runner_files(
+            folder=integration_folder,
+            customer_name=customer_name,
+            analysis_result=analysis_result,
+            api_config_path=config_path,
         )
 
         self._generate_readme(
@@ -91,11 +87,10 @@ class ApiIntegrationGenerator:
         return {
             "status": "success",
             "customer_name": customer_name,
-            "integration_folder": str(
-                integration_folder
-            ),
+            "integration_folder": str(integration_folder),
             "config_path": config_path,
             "mapping_path": mapping_path,
+            "runner_files": runner_files,
         }
 
     def _get_safe_customer_name(
@@ -215,63 +210,12 @@ class ApiIntegrationGenerator:
 
         return str(mapping_path)
 
-    def _generate_runner(
-        self,
-        folder: Path,
-        customer_name: str,
-    ):
-        """
-        Generate starter runner file.
-        """
-
-        runner_path = folder / "runner.py"
-
-        runner_path.write_text(
-            f'''"""
-Generated API Runner
-Customer: {customer_name}
-
-Purpose:
-    Starter entry point for running this generated
-    customer API integration.
-"""
-
-print("API integration runner placeholder")
-''',
-            encoding="utf-8",
-        )
-
-    def _generate_api_client(
-        self,
-        folder: Path,
-        customer_name: str,
-    ):
-        """
-        Generate starter API client file.
-        """
-
-        client_path = folder / "api_client.py"
-
-        client_path.write_text(
-            f'''"""
-Generated API Client
-Customer: {customer_name}
-
-Purpose:
-    Starter client for customer REST API calls.
-"""
-
-print("API client placeholder")
-''',
-            encoding="utf-8",
-        )
-
     def _generate_readme(
         self,
         folder: Path,
         analysis_result: Dict,
         mapping_path: str,
-    ):
+    ) -> None:
         """
         Generate integration README.
         """
@@ -299,6 +243,12 @@ Response Root:
 
 Mapping File:
 {mapping_path}
+
+Generated Files:
+- config.json
+- api_client.py
+- runner.py
+- mapping.json
 """,
             encoding="utf-8",
         )

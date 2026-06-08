@@ -10,11 +10,11 @@
         "ORD_DES": "item"
     },
     "mapping_confidence": {
-        "ORD_ORDINE": 95,
+        "ORD_ORDINE": 90,
         "ORD_DES": 80
     },
     "mapping_notes": {
-        "ORD_ORDINE": "Likely represents order number/id, a clear match to order_id.",
-        "ORD_DES": "Probably description of the item ordered, matching item field."
+        "ORD_ORDINE": "Likely order identifier due to 'ORD_' prefix and 'ORDINE' meaning order in Italian.",
+        "ORD_DES": "Likely item description based on 'DES' abbreviation."
     }
 }

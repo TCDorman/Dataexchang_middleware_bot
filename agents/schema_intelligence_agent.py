@@ -1,3 +1,24 @@
+"""
+==================================================
+Schema Intelligence Agent
+==================================================
+
+Purpose:
+    Infers field mappings from customer CSV files using:
+    - OpenAI mapping when available
+    - fallback header/value pattern intelligence
+
+Responsibilities:
+    - Read CSV files
+    - Analyze column names
+    - Analyze sample values
+    - Return suggested mappings and confidence scores
+"""
+
+# ==================================================
+# Imports
+# ==================================================
+
 import sys
 import re
 from pathlib import Path
@@ -9,39 +30,20 @@ sys.path.append(
 import pandas as pd
 
 from agents.openai_mapping_agent import infer_mapping_with_openai
+from agents.dynamic_mapping_agent import infer_mapping_from_columns
 
-from agents.dynamic_mapping_agent import (
-    infer_mapping_from_columns,
-)
-try:
-    openai_mapping = infer_mapping_with_openai(
-        columns=list(df.columns),
-        sample_rows=df.head(5).to_dict(orient="records"),
-    )
 
-    return {
-        "file_path": file_path,
-        "columns": list(df.columns),
-        "mapping": openai_mapping,
-        "confidence": {
-            field: 95 if column else 0
-            for field, column in openai_mapping.items()
-        },
-        "sample_rows": df.head(3).to_dict(orient="records"),
-        "mapping_source": "openai",
-    }
-
-except Exception as error:
-    print(f"OpenAI mapping unavailable, using fallback: {error}")
 # ==================================================
 # Value Pattern Checks
 # ==================================================
+
 def looks_numeric(values):
     """
     Check whether most sample values look numeric.
 
     Useful for detecting quantity fields.
     """
+
     checked_values = [
         value
         for value in values
@@ -67,12 +69,8 @@ def looks_numeric(values):
 def looks_like_item_code(values):
     """
     Check whether values look like item/SKU/part codes.
-
-    Examples:
-    ABC123
-    PART-001
-    SKU_9988
     """
+
     checked_values = [
         str(value).strip()
         for value in values
@@ -98,12 +96,8 @@ def looks_like_item_code(values):
 def looks_like_name(values):
     """
     Check whether values look like customer/company names.
-
-    This is intentionally simple for now:
-    - mostly text
-    - not mostly numeric
-    - not item-code-like
     """
+
     checked_values = [
         str(value).strip()
         for value in values
@@ -129,11 +123,13 @@ def looks_like_name(values):
 # ==================================================
 # Analyze One Column
 # ==================================================
+
 def analyze_column_values(series):
     """
     Analyze sample values from a single column and return
     evidence scores for possible canonical fields.
     """
+
     sample_values = series.dropna().head(10).tolist()
 
     numeric_score = looks_numeric(sample_values)
@@ -148,18 +144,77 @@ def analyze_column_values(series):
 
 
 # ==================================================
-# Combine Header + Value Intelligence
+# OpenAI Mapping Attempt
 # ==================================================
-def infer_mapping_with_samples(file_path: str):
-    """
-    Infer field mappings using both:
-    1. Column/header names
-    2. Sample value patterns
 
-    This improves mapping when headers are vague, such as:
-    ID, NAME, CODE, AMOUNT
+def try_openai_mapping(
+    file_path: str,
+    df: pd.DataFrame,
+):
     """
-    df = pd.read_csv(file_path)
+    Try to infer mapping using OpenAI.
+
+    Args:
+        file_path:
+            CSV file path.
+        df:
+            Loaded CSV dataframe.
+
+    Returns:
+        OpenAI mapping result if successful, otherwise None.
+    """
+
+    try:
+        sample_record = {
+            "columns": list(df.columns),
+            "sample_rows": df.head(5).to_dict(
+                orient="records"
+            ),
+        }
+
+        openai_mapping = infer_mapping_with_openai(
+            sample_record
+        )
+
+        if not isinstance(openai_mapping, dict):
+            return None
+
+        if "error" in openai_mapping:
+            return None
+
+        return {
+            "file_path": file_path,
+            "columns": list(df.columns),
+            "mapping": openai_mapping,
+            "confidence": {
+                field: 95 if column else 0
+                for field, column in openai_mapping.items()
+            },
+            "sample_rows": df.head(3).to_dict(
+                orient="records"
+            ),
+            "mapping_source": "openai",
+        }
+
+    except Exception as error:
+        print(
+            f"OpenAI mapping unavailable, using fallback: {error}"
+        )
+
+        return None
+
+
+# ==================================================
+# Fallback Mapping
+# ==================================================
+
+def infer_mapping_with_fallback(
+    file_path: str,
+    df: pd.DataFrame,
+):
+    """
+    Infer field mappings using header names and value patterns.
+    """
 
     header_result = infer_mapping_from_columns(df.columns)
 
@@ -174,18 +229,12 @@ def infer_mapping_with_samples(file_path: str):
         "operation_type": {},
     }
 
-    # ----------------------------------------------
-    # Add header-based scores
-    # ----------------------------------------------
     for canonical_field, column_name in header_mapping.items():
         if column_name:
             field_scores[canonical_field][column_name] = (
                 header_confidence.get(canonical_field, 0)
             )
 
-    # ----------------------------------------------
-    # Add value-pattern scores
-    # ----------------------------------------------
     for column in df.columns:
         value_scores = analyze_column_values(df[column])
 
@@ -200,9 +249,6 @@ def infer_mapping_with_samples(file_path: str):
                 score,
             )
 
-    # ----------------------------------------------
-    # Pick best column for each canonical field
-    # ----------------------------------------------
     final_mapping = {}
     final_confidence = {}
 
@@ -231,17 +277,51 @@ def infer_mapping_with_samples(file_path: str):
         "columns": list(df.columns),
         "mapping": final_mapping,
         "confidence": final_confidence,
-        "sample_rows": df.head(3).to_dict(orient="records"),
+        "sample_rows": df.head(3).to_dict(
+            orient="records"
+        ),
+        "mapping_source": "fallback",
     }
+
+
+# ==================================================
+# Combine Header + Value Intelligence
+# ==================================================
+
+def infer_mapping_with_samples(file_path: str):
+    """
+    Infer field mappings using:
+    1. OpenAI, if available
+    2. Fallback header/value intelligence
+    """
+
+    df = pd.read_csv(file_path)
+
+    openai_result = try_openai_mapping(
+        file_path=file_path,
+        df=df,
+    )
+
+    if openai_result:
+        return openai_result
+
+    return infer_mapping_with_fallback(
+        file_path=file_path,
+        df=df,
+    )
 
 
 # ==================================================
 # Analyze Multiple Files
 # ==================================================
-def analyze_files_with_schema_intelligence(file_paths: list[str]):
+
+def analyze_files_with_schema_intelligence(
+    file_paths: list[str],
+):
     """
     Analyze one or more CSV files using schema intelligence.
     """
+
     results = []
 
     for file_path in file_paths:
@@ -254,6 +334,7 @@ def analyze_files_with_schema_intelligence(file_paths: list[str]):
                     "error": f"Unsupported file type: {extension}",
                 }
             )
+
             continue
 
         results.append(
@@ -266,6 +347,7 @@ def analyze_files_with_schema_intelligence(file_paths: list[str]):
 # ==================================================
 # Manual Test
 # ==================================================
+
 if __name__ == "__main__":
     results = analyze_files_with_schema_intelligence(
         [

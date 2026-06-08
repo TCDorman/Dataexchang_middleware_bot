@@ -20,7 +20,7 @@ from typing import Dict, List
 
 from src.ai.profile_generation_agent import ProfileGenerationAgent
 from src.profiles.profile_saver import ProfileSaver
-from src.validation.ai_profile_validator import AIProfileValidator
+from src.validation.validation_manager import ValidationManager
 
 
 class CustomerOnboardingAgent:
@@ -35,7 +35,7 @@ class CustomerOnboardingAgent:
 
         self.profile_generation_agent = ProfileGenerationAgent()
         self.profile_saver = ProfileSaver()
-        self.profile_validator = AIProfileValidator()
+        self.validation_manager = ValidationManager()
 
     def onboard_customer(
         self,
@@ -59,7 +59,7 @@ class CustomerOnboardingAgent:
             headers
         )
 
-        validation_result = self.profile_validator.validate_profile(
+        validation_result = self.validation_manager.validate_profile(
             generated_profile
         )
 

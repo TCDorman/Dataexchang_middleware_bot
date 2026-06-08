@@ -1,0 +1,10 @@
+{
+    "customer_name": "demo_erp",
+    "base_url": "https://api.demo-erp.com/v1",
+    "orders_endpoint": "/orders",
+    "auth_type": "api_key",
+    "api_key_header": "Authorization",
+    "api_key_env_var": "",
+    "http_method": "GET",
+    "response_root": "orders"
+}

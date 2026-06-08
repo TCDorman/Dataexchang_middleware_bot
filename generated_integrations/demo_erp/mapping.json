@@ -1,0 +1,27 @@
+{
+    "source_type": "rest_api",
+    "target_system": "Modula WMS",
+    "response_root": "orders",
+    "suggested_mapping": {
+        "order_number": "orderNo",
+        "description": "description",
+        "operation_type": "type",
+        "lines": {
+            "item_code": "sku",
+            "quantity": "qty"
+        }
+    },
+    "confidence": {
+        "base_url": 100,
+        "orders_endpoint": 100,
+        "auth_type": 90,
+        "suggested_mapping": 95
+    },
+    "notes": [
+        "Authentication requires API key in Authorization header.",
+        "Operation type correlates to 'type' field, values like 'PICK'.",
+        "Quantity is an integer in 'qty' field.",
+        "No explicit environment variable name provided for API key.",
+        "Response root is the 'orders' array."
+    ]
+}

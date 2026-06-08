@@ -8,10 +8,31 @@ sys.path.append(
 
 import pandas as pd
 
+from agents.openai_mapping_agent import infer_mapping_with_openai
+
 from agents.dynamic_mapping_agent import (
     infer_mapping_from_columns,
 )
+try:
+    openai_mapping = infer_mapping_with_openai(
+        columns=list(df.columns),
+        sample_rows=df.head(5).to_dict(orient="records"),
+    )
 
+    return {
+        "file_path": file_path,
+        "columns": list(df.columns),
+        "mapping": openai_mapping,
+        "confidence": {
+            field: 95 if column else 0
+            for field, column in openai_mapping.items()
+        },
+        "sample_rows": df.head(3).to_dict(orient="records"),
+        "mapping_source": "openai",
+    }
+
+except Exception as error:
+    print(f"OpenAI mapping unavailable, using fallback: {error}")
 # ==================================================
 # Value Pattern Checks
 # ==================================================

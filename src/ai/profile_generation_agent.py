@@ -15,6 +15,34 @@ from typing import Dict, List
 
 from src.ai.openai_client import OpenAIClient
 
+# ==================================================
+# Response Cleaning
+# ==================================================
+
+def clean_json_response(response_text: str) -> str:
+    """
+    Remove markdown code fences from an AI response.
+
+    Args:
+        response_text:
+            Raw response returned by OpenAI.
+
+    Returns:
+        Clean JSON string.
+    """
+
+    cleaned = response_text.strip()
+
+    if cleaned.startswith("```json"):
+        cleaned = cleaned.replace("```json", "", 1)
+
+    if cleaned.startswith("```"):
+        cleaned = cleaned.replace("```", "", 1)
+
+    if cleaned.endswith("```"):
+        cleaned = cleaned[:-3]
+
+    return cleaned.strip()
 
 class ProfileGenerationAgent:
     """
@@ -85,11 +113,14 @@ Rules:
 """
 
         response = self.openai_client.ask(prompt)
+        cleaned_response = clean_json_response(response)
 
         try:
-            return json.loads(response)
+            return json.loads(cleaned_response)
 
         except json.JSONDecodeError as error:
             raise ValueError(
-                f"OpenAI did not return valid JSON. Raw response: {response}"
-            ) from error
+        "OpenAI did not return valid JSON.\n"
+        f"Raw response: {response}\n"
+        f"Cleaned response: {cleaned_response}"
+    ) from error

@@ -1,4 +1,5 @@
 import argparse
+import json
 import shutil
 import time
 from datetime import datetime
@@ -12,6 +13,10 @@ from agents.master_agent import (
 )
 
 from agents.history_agent import show_integration_history
+
+from agents.rest_api_onboarding_agent import (
+    generate_rest_integration_package,
+)
 
 
 # ==================================================
@@ -312,6 +317,24 @@ def watch_folder(
 
 
 # ==================================================
+# Load REST API Config
+# ==================================================
+def load_rest_api_config(config_path: str):
+    """
+    Load a REST API onboarding config from JSON.
+    """
+    path = Path(config_path)
+
+    if not path.exists():
+        raise FileNotFoundError(
+            f"REST API config file does not exist: {path}"
+        )
+
+    with open(path, "r", encoding="utf-8") as file:
+        return json.load(file)
+
+
+# ==================================================
 # Main CLI Entry Point
 # ==================================================
 def main():
@@ -430,6 +453,20 @@ def main():
         help="Polling interval in seconds",
     )
 
+    # ----------------------------------------------
+    # Generate REST Integration Command
+    # ----------------------------------------------
+    rest_parser = subparsers.add_parser(
+        "generate-rest",
+        help="Generate a REST API integration package from a config file",
+    )
+
+    rest_parser.add_argument(
+        "--config",
+        required=True,
+        help="Path to REST API config JSON file",
+    )
+
     args = parser.parse_args()
 
     # ----------------------------------------------
@@ -491,6 +528,14 @@ def main():
             args.input_dir,
             args.interval,
         )
+
+    elif args.command == "generate-rest":
+        api_config = load_rest_api_config(args.config)
+
+        result = generate_rest_integration_package(api_config)
+
+        print("\nREST INTEGRATION PACKAGE GENERATED")
+        print(result)
 
 
 if __name__ == "__main__":

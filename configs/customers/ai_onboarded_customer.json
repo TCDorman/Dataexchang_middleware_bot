@@ -1,0 +1,20 @@
+{
+    "customer_name": "Unknown Customer",
+    "header_signature": [
+        "ORD_ORDINE",
+        "ORD_DES",
+        "ORD_TIPOOP"
+    ],
+    "field_mapping": {
+        "ORD_ORDINE": "order_id",
+        "ORD_DES": "item"
+    },
+    "mapping_confidence": {
+        "ORD_ORDINE": 95,
+        "ORD_DES": 80
+    },
+    "mapping_notes": {
+        "ORD_ORDINE": "Likely represents order number/id, a clear match to order_id.",
+        "ORD_DES": "Probably description of the item ordered, matching item field."
+    }
+}

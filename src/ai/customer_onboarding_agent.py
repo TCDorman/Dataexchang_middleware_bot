@@ -7,10 +7,11 @@ This agent:
 
 1. Reads unknown CSV headers
 2. Generates a customer profile using OpenAI
-3. Shows a human-friendly mapping review
-4. Warns about low-confidence mappings
-5. Requests approval
-6. Saves the profile if approved
+3. Validates the AI-generated profile
+4. Shows a human-friendly mapping review
+5. Warns about low-confidence mappings
+6. Requests approval
+7. Saves the profile if approved
 """
 
 import csv
@@ -19,6 +20,7 @@ from typing import Dict, List
 
 from src.ai.profile_generation_agent import ProfileGenerationAgent
 from src.profiles.profile_saver import ProfileSaver
+from src.validation.ai_profile_validator import AIProfileValidator
 
 
 class CustomerOnboardingAgent:
@@ -33,6 +35,7 @@ class CustomerOnboardingAgent:
 
         self.profile_generation_agent = ProfileGenerationAgent()
         self.profile_saver = ProfileSaver()
+        self.profile_validator = AIProfileValidator()
 
     def onboard_customer(
         self,
@@ -40,7 +43,7 @@ class CustomerOnboardingAgent:
         profile_name: str,
     ) -> Dict:
         """
-        Generate, review, approve, and save a customer profile.
+        Generate, validate, review, approve, and save a customer profile.
 
         Args:
             file_path: Customer CSV file.
@@ -55,6 +58,19 @@ class CustomerOnboardingAgent:
         generated_profile = self.profile_generation_agent.generate_profile(
             headers
         )
+
+        validation_result = self.profile_validator.validate_profile(
+            generated_profile
+        )
+
+        self._print_validation_review(validation_result)
+
+        if not validation_result["is_valid"]:
+            return {
+                "status": "failed",
+                "reason": "Profile validation failed.",
+                "validation_result": validation_result,
+            }
 
         self._print_mapping_review(generated_profile)
 
@@ -76,6 +92,7 @@ class CustomerOnboardingAgent:
         return {
             "status": "success",
             "profile": generated_profile,
+            "validation_result": validation_result,
             "save_result": save_result,
         }
 
@@ -103,6 +120,36 @@ class CustomerOnboardingAgent:
             headers = next(reader)
 
         return headers
+
+    def _print_validation_review(
+        self,
+        validation_result: Dict,
+    ) -> None:
+        """
+        Print profile validation results.
+
+        Args:
+            validation_result: AI profile validation result.
+        """
+
+        print("\nPROFILE VALIDATION RESULTS")
+        print("=" * 60)
+
+        print(f"Valid: {validation_result['is_valid']}")
+
+        if validation_result["errors"]:
+            print("\nErrors:")
+
+            for error in validation_result["errors"]:
+                print(f"  - {error}")
+
+        if validation_result["warnings"]:
+            print("\nWarnings:")
+
+            for warning in validation_result["warnings"]:
+                print(f"  - {warning}")
+
+        print("=" * 60)
 
     def _print_mapping_review(
         self,

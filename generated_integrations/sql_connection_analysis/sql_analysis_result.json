@@ -1,0 +1,6 @@
+{
+    "status": "not_implemented_yet",
+    "source_type": "sql",
+    "message": "SQL / ODBC schema discovery will be added in the next phase.",
+    "connection_preview": "Driver={SQL Server};Server=localhost;Database=CustomerERP;Uid=****;PWD=****;"
+}

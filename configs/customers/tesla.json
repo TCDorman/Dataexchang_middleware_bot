@@ -4,16 +4,16 @@
     "target_system": "Modula WMS",
     "target_format": "XML",
     "header_signature": [
-        "PO_ID",
-        "Buyer",
-        "PartNumber",
-        "AmountRequested"
+        "SHIP_REF",
+        "BUYER_CODE",
+        "SKU_NUMBER",
+        "QTY_NEEDED"
     ],
     "field_mapping": {
-        "order_id": "PO_ID",
-        "customer_name": "Buyer",
-        "item": "PartNumber",
-        "quantity": "AmountRequested"
+        "order_id": "SHIP_REF",
+        "customer_name": "BUYER_CODE",
+        "item": "SKU_NUMBER",
+        "quantity": "QTY_NEEDED"
     },
     "validation_rules": {
         "order_id": "required",
@@ -28,9 +28,9 @@
         "quantity": 95
     },
     "mapping_notes": {
-        "order_id": "PO_ID clearly identifies the purchase order.",
-        "customer_name": "Buyer matches customer but may vary in naming.",
-        "item": "PartNumber directly corresponds to item identifier.",
-        "quantity": "AmountRequested is numeric and indicates quantity."
+        "order_id": "SHIP_REF clearly represents the order identifier.",
+        "customer_name": "BUYER_CODE usually denotes the customer, but may not always be a full name.",
+        "item": "SKU_NUMBER matches the inventory item identifier perfectly.",
+        "quantity": "QTY_NEEDED directly indicates the required quantity as a numeric value."
     }
 }

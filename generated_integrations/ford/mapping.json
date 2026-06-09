@@ -1,6 +1,6 @@
 {
-    "order_id": "Order Number",
-    "customer_name": "Customer",
-    "item": "SKU",
-    "quantity": "Qty"
+    "order_id": "",
+    "customer_name": "",
+    "item": "",
+    "quantity": ""
 }

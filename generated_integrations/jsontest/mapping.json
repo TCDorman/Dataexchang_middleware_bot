@@ -1,0 +1,6 @@
+{
+    "order_id": "PO_ID",
+    "customer_name": "Buyer",
+    "item": "PartNumber",
+    "quantity": "AmountRequested"
+}

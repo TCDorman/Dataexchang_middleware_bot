@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Orders>
+    <Order>
+        <OrderID>ACME-3001</OrderID>
+        <CustomerName>ACME</CustomerName>
+        <Lines>
+            <Line>
+                <Item>PART-A</Item>
+                <Quantity>4</Quantity>
+            </Line>
+            <Line>
+                <Item>PART-B</Item>
+                <Quantity>8</Quantity>
+            </Line>
+        </Lines>
+    </Order>
+    <Order>
+        <OrderID>ACME-3002</OrderID>
+        <CustomerName>ACME</CustomerName>
+        <Lines>
+            <Line>
+                <Item>PART-C</Item>
+                <Quantity>12</Quantity>
+            </Line>
+        </Lines>
+    </Order>
+</Orders>

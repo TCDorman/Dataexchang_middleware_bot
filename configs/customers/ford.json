@@ -1,17 +1,16 @@
 {
     "customer_name": "Ford",
-
-    "header_signature": [
-        "Order Number",
-        "Customer",
-        "Part",
-        "Qty"
-    ],
-
+    "source_type": "csv",
+    "target_system": "Modula WMS",
+    "target_format": "XML",
+    "header_signature": [],
     "field_mapping": {
-        "Order Number": "order_id",
-        "Customer": "customer_name",
-        "Part": "item",
-        "Qty": "quantity"
-    }
+        "order_id": "",
+        "customer_name": "",
+        "item": "",
+        "quantity": ""
+    },
+    "validation_rules": {},
+    "mapping_confidence": {},
+    "mapping_notes": {}
 }

@@ -1,0 +1,36 @@
+{
+    "customer_name": "jsontest",
+    "source_type": "json",
+    "target_system": "Modula WMS",
+    "target_format": "XML",
+    "header_signature": [
+        "PO_ID",
+        "Buyer",
+        "PartNumber",
+        "AmountRequested"
+    ],
+    "field_mapping": {
+        "order_id": "PO_ID",
+        "customer_name": "Buyer",
+        "item": "PartNumber",
+        "quantity": "AmountRequested"
+    },
+    "validation_rules": {
+        "order_id": "required",
+        "customer_name": "optional",
+        "item": "required",
+        "quantity": "required_numeric"
+    },
+    "mapping_confidence": {
+        "order_id": 98,
+        "customer_name": 90,
+        "item": 98,
+        "quantity": 98
+    },
+    "mapping_notes": {
+        "order_id": "Direct match to purchase order ID.",
+        "customer_name": "Buyer field typically maps to customer name.",
+        "item": "PartNumber is a clear item identifier.",
+        "quantity": "AmountRequested represents numeric quantity requested."
+    }
+}

@@ -1,134 +1,100 @@
 """
-==================================================
-REST API Connector
-==================================================
+rest_api_connector.py
 
-Purpose:
-    Provides a reusable REST API client for customer
-    integrations.
-
-Responsibilities:
-    - Load API configuration
-    - Build authentication headers
-    - Execute GET requests
-    - Execute POST requests
-    - Return JSON responses
+Uses OpenAI to analyze REST API documentation and generate
+an integration profile.
 """
 
-# ==================================================
-# Imports
-# ==================================================
-
 import json
-import os
-from typing import Dict, Optional
+from typing import Dict
 
-import requests
+from src.ai.openai_client import OpenAIClient
 
 
-# ==================================================
-# REST API Connector
-# ==================================================
+def clean_json_response(response_text: str) -> str:
+    """
+    Remove markdown code fences from OpenAI responses.
+    """
+
+    cleaned = response_text.strip()
+
+    if cleaned.startswith("```json"):
+        cleaned = cleaned.replace("```json", "", 1)
+
+    if cleaned.startswith("```"):
+        cleaned = cleaned.replace("```", "", 1)
+
+    if cleaned.endswith("```"):
+        cleaned = cleaned[:-3]
+
+    return cleaned.strip()
+
 
 class RestApiConnector:
     """
-    Generic REST API connector.
+    AI-powered REST API documentation analyzer.
     """
 
-    def __init__(
+    def __init__(self):
+        self.openai_client = OpenAIClient()
+
+    def analyze_api_documentation(
         self,
-        config_path: str,
-    ):
-        """
-        Initialize connector using a config file.
-        """
-
-        self.config = self._load_config(
-            config_path
-        )
-
-        self.base_url = self.config["base_url"]
-
-    def get(
-        self,
-        endpoint: str,
-        params: Optional[Dict] = None,
+        documentation_text: str,
     ) -> Dict:
-        """
-        Execute GET request.
-        """
 
-        response = requests.get(
-            f"{self.base_url}{endpoint}",
-            headers=self._build_headers(),
-            params=params,
-            timeout=30,
-        )
+        prompt = f"""
+You are a warehouse integration expert.
 
-        response.raise_for_status()
+Analyze the following API documentation.
 
-        return response.json()
+Determine:
 
-    def post(
-        self,
-        endpoint: str,
-        payload: Dict,
-    ) -> Dict:
-        """
-        Execute POST request.
-        """
+1. Which endpoint most likely contains order data
+2. Which fields map to:
+   - order_id
+   - customer_name
+   - item
+   - quantity
 
-        response = requests.post(
-            f"{self.base_url}{endpoint}",
-            headers=self._build_headers(),
-            json=payload,
-            timeout=30,
-        )
+Return ONLY valid JSON.
 
-        response.raise_for_status()
+JSON format:
 
-        return response.json()
+{{
+    "source_type": "rest_api",
+    "order_endpoint": "",
+    "field_mapping": {{
+        "order_id": "",
+        "customer_name": "",
+        "item": "",
+        "quantity": ""
+    }},
+    "confidence_score": 0,
+    "notes": []
+}}
 
-    def _build_headers(
-        self,
-    ) -> Dict:
-        """
-        Build authentication headers.
-        """
+API Documentation:
 
-        auth_type = self.config.get(
-            "auth_type",
-            "api_key",
-        )
+{documentation_text[:12000]}
+"""
 
-        if auth_type == "api_key":
-            api_key = os.getenv(
-                self.config["api_key_env_var"]
-            )
+        response = self.openai_client.ask(prompt)
 
-            if not api_key:
-                raise ValueError(
-                    "Missing API key environment variable: "
-                    f"{self.config['api_key_env_var']}"
-                )
+        cleaned = clean_json_response(response)
+
+        try:
+            result = json.loads(cleaned)
+
+            result["status"] = "success"
+
+            return result
+
+        except json.JSONDecodeError:
 
             return {
-                self.config["api_key_header"]: api_key
+                "status": "error",
+                "source_type": "rest_api",
+                "message": "OpenAI returned invalid JSON.",
+                "raw_response": response,
             }
-
-        return {}
-
-    def _load_config(
-        self,
-        config_path: str,
-    ) -> Dict:
-        """
-        Load JSON API configuration.
-        """
-
-        with open(
-            config_path,
-            "r",
-            encoding="utf-8",
-        ) as file:
-            return json.load(file)

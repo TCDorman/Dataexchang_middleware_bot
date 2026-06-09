@@ -1,0 +1,36 @@
+{
+    "customer_name": "acme",
+    "source_type": "csv",
+    "target_system": "Modula WMS",
+    "target_format": "XML",
+    "header_signature": [
+        "PO",
+        "Client",
+        "SKU",
+        "Amount"
+    ],
+    "field_mapping": {
+        "order_id": "PO",
+        "customer_name": "Client",
+        "item": "SKU",
+        "quantity": "Amount"
+    },
+    "validation_rules": {
+        "order_id": "required",
+        "customer_name": "optional",
+        "item": "required",
+        "quantity": "required_numeric"
+    },
+    "mapping_confidence": {
+        "order_id": 98,
+        "customer_name": 90,
+        "item": 97,
+        "quantity": 96
+    },
+    "mapping_notes": {
+        "order_id": "PO is a common term for purchase order ID.",
+        "customer_name": "Client matches common naming for customer names.",
+        "item": "SKU is the standard identifier for inventory items.",
+        "quantity": "Amount indicates the number of units to handle."
+    }
+}

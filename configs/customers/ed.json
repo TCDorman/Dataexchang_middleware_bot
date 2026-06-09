@@ -1,0 +1,36 @@
+{
+    "customer_name": "ED",
+    "source_type": "csv",
+    "target_system": "Modula WMS",
+    "target_format": "XML",
+    "header_signature": [
+        "Order Number",
+        "Customer",
+        "SKU",
+        "Qty"
+    ],
+    "field_mapping": {
+        "order_id": "Order Number",
+        "customer_name": "Customer",
+        "item": "SKU",
+        "quantity": "Qty"
+    },
+    "validation_rules": {
+        "order_id": "required",
+        "customer_name": "optional",
+        "item": "required",
+        "quantity": "required_numeric"
+    },
+    "mapping_confidence": {
+        "order_id": 98,
+        "customer_name": 90,
+        "item": 98,
+        "quantity": 98
+    },
+    "mapping_notes": {
+        "order_id": "Matches common order identifier.",
+        "customer_name": "Standard customer field, but optional for WMS.",
+        "item": "SKU clearly represents item identifier.",
+        "quantity": "Qty clearly indicates numeric quantity."
+    }
+}

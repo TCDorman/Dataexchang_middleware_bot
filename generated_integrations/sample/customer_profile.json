@@ -1,0 +1,35 @@
+{
+    "customer_name": "SAMPLE",
+    "source_type": "json",
+    "target_system": "Modula WMS",
+    "target_format": "XML",
+    "header_signature": [
+        "openapi",
+        "info",
+        "paths"
+    ],
+    "field_mapping": {
+        "order_id": "openapi",
+        "customer_name": "info",
+        "item": "paths",
+        "quantity": "paths"
+    },
+    "validation_rules": {
+        "order_id": "required",
+        "customer_name": "optional",
+        "item": "required",
+        "quantity": "required_numeric"
+    },
+    "mapping_confidence": {
+        "order_id": 95,
+        "customer_name": 90,
+        "item": 85,
+        "quantity": 85
+    },
+    "mapping_notes": {
+        "order_id": "Maps to 'openapi' as a unique identifier for orders.",
+        "customer_name": "Maps to 'info', likely containing customer details.",
+        "item": "Maps to 'paths', assumed to hold item details in JSON structure.",
+        "quantity": "Maps to 'paths', assumed to hold quantity numeric values."
+    }
+}

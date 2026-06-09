@@ -1,0 +1,16 @@
+{
+    "customer_name": "Ford",
+    "source_type": "csv",
+    "target_system": "Modula WMS",
+    "target_format": "XML",
+    "header_signature": [],
+    "field_mapping": {
+        "order_id": "",
+        "customer_name": "",
+        "item": "",
+        "quantity": ""
+    },
+    "validation_rules": {},
+    "mapping_confidence": {},
+    "mapping_notes": {}
+}

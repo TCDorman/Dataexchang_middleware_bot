@@ -1,6 +1,6 @@
 {
-    "order_id": "PO_ID",
-    "customer_name": "Buyer",
-    "item": "PartNumber",
-    "quantity": "AmountRequested"
+    "order_id": "SHIP_REF",
+    "customer_name": "BUYER_CODE",
+    "item": "SKU_NUMBER",
+    "quantity": "QTY_NEEDED"
 }

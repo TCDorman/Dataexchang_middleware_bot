@@ -10,7 +10,9 @@ Purpose:
 # Imports
 # ==================================================
 
-from src.connectors.rest_api_connector import RestApiConnector
+from src.connectors.rest_api_connector import (
+    RestApiConnector,
+)
 
 
 # ==================================================
@@ -39,7 +41,9 @@ class GeneratedApiClient:
         endpoint: str,
     ):
         """
-        Fetch orders from the configured API endpoint.
+        Fetch orders from customer API.
         """
 
-        return self.connector.get(endpoint)
+        return self.connector.get(
+            endpoint
+        )

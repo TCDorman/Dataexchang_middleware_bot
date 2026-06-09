@@ -4,7 +4,7 @@
     "orders_endpoint": "/orders",
     "auth_type": "api_key",
     "api_key_header": "Authorization",
-    "api_key_env_var": "",
+    "api_key_env_var": "DEMO_API_KEY",
     "http_method": "GET",
     "response_root": "orders"
 }

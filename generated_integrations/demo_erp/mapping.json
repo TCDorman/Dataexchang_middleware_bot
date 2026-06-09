@@ -18,9 +18,9 @@
         "suggested_mapping": 95
     },
     "notes": [
-        "Authentication uses API key passed in the Authorization header; confirm exact header format with customer.",
-        "The 'type' field maps to Modula WMS operation_type; validate the values supported in WMS.",
-        "Response root 'orders' contains the order list array.",
-        "The sample response aligns well with expected data structures for orders and order lines."
+        "Authorization header requires API key; format or exact header value unknown, usually 'Authorization: ApiKey <key>' or 'Authorization: Bearer <key>'.",
+        "Order type 'PICK' assumed to map directly to operation_type in WMS.",
+        "API key environment variable not specified; recommend setting own env var for integration.",
+        "Response schema defined based on sample; additional fields, error handling or pagination not detailed."
     ]
 }

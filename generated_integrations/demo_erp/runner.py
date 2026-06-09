@@ -1,8 +1,10 @@
 """
 Generated API Runner
+Customer: demo_erp
 
 Purpose:
-    Runs the generated customer API integration.
+    Fetches orders from the customer API and converts
+    them into Modula WMS XML.
 """
 
 # ==================================================
@@ -13,6 +15,7 @@ import json
 from pathlib import Path
 
 from api_client import GeneratedApiClient
+from src.connectors.api_to_wms_pipeline import ApiToWmsPipeline
 
 
 # ==================================================
@@ -21,7 +24,7 @@ from api_client import GeneratedApiClient
 
 def load_config():
     """
-    Load package config.json.
+    Load generated package config.
     """
 
     config_path = Path(__file__).parent / "config.json"
@@ -35,12 +38,12 @@ def load_config():
 
 
 # ==================================================
-# Main Runner
+# Main
 # ==================================================
 
 def main():
     """
-    Fetch orders from customer API.
+    Run generated API integration.
     """
 
     config = load_config()
@@ -49,12 +52,22 @@ def main():
         config["api_config_path"]
     )
 
-    orders_response = client.fetch_orders(
+    api_response = client.fetch_orders(
         config["orders_endpoint"]
     )
 
-    print("API RESPONSE")
-    print(json.dumps(orders_response, indent=4))
+    pipeline = ApiToWmsPipeline()
+
+    result = pipeline.process_response(
+        api_response=api_response,
+        mapping_path=str(
+            Path(__file__).parent / config["mapping_file"]
+        ),
+        output_path="data/output/demo_erp_api_orders.xml",
+    )
+
+    print("\nAPI INTEGRATION COMPLETE")
+    print(result)
 
 
 if __name__ == "__main__":

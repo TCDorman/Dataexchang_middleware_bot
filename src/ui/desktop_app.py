@@ -2,20 +2,15 @@
 desktop_app.py
 
 Desktop interface for the Modula WMS Data Integration Agent.
-
-Features:
-1. Select and process customer CSV files
-2. View processing results
-3. Open generated XML files
-4. View customer profile mappings
 """
 
 import json
 import os
 import tkinter as tk
 from pathlib import Path
-from tkinter import filedialog, messagebox
+from tkinter import filedialog, messagebox, simpledialog
 
+from agents.integration_package_generator import generate_integration_package_from_file
 from src.pipeline.file_processing_pipeline import FileProcessingPipeline
 from src.profiles.profile_registry import ProfileRegistry
 
@@ -26,13 +21,9 @@ class ModulaIntegrationApp:
     """
 
     def __init__(self, root: tk.Tk):
-        """
-        Initialize the desktop application.
-        """
-
         self.root = root
         self.root.title("Modula WMS Data Integration Agent")
-        self.root.geometry("850x600")
+        self.root.geometry("850x650")
 
         self.selected_file = None
         self.latest_output_path = None
@@ -43,10 +34,6 @@ class ModulaIntegrationApp:
         self._build_ui()
 
     def _build_ui(self):
-        """
-        Build the main application UI.
-        """
-
         title = tk.Label(
             self.root,
             text="Modula WMS Data Integration Agent",
@@ -65,15 +52,23 @@ class ModulaIntegrationApp:
             self.root,
             text="Select Customer CSV File",
             command=self.select_file,
-            width=30,
+            width=35,
         )
         select_button.pack(pady=5)
+
+        ai_package_button = tk.Button(
+            self.root,
+            text="Generate AI Integration Package",
+            command=self.generate_ai_integration_package,
+            width=35,
+        )
+        ai_package_button.pack(pady=5)
 
         process_button = tk.Button(
             self.root,
             text="Process File",
             command=self.process_file,
-            width=30,
+            width=35,
         )
         process_button.pack(pady=5)
 
@@ -81,7 +76,7 @@ class ModulaIntegrationApp:
             self.root,
             text="Open Generated XML",
             command=self.open_generated_xml,
-            width=30,
+            width=35,
             state=tk.DISABLED,
         )
         self.open_xml_button.pack(pady=5)
@@ -90,22 +85,18 @@ class ModulaIntegrationApp:
             self.root,
             text="View Customer Profiles",
             command=self.open_profile_manager,
-            width=30,
+            width=35,
         )
         profiles_button.pack(pady=5)
 
         self.output_text = tk.Text(
             self.root,
-            height=20,
+            height=22,
             width=95,
         )
         self.output_text.pack(pady=15)
 
     def select_file(self):
-        """
-        Let the user select a CSV file.
-        """
-
         file_path = filedialog.askopenfilename(
             title="Select Customer CSV File",
             filetypes=[
@@ -123,11 +114,67 @@ class ModulaIntegrationApp:
                 text=f"Selected: {Path(file_path).name}"
             )
 
-    def process_file(self):
-        """
-        Process the selected CSV file.
-        """
+    def generate_ai_integration_package(self):
+        if not self.selected_file:
+            messagebox.showwarning(
+                "No File Selected",
+                "Please select a CSV file first.",
+            )
+            return
 
+        customer_name = simpledialog.askstring(
+            "Customer Name",
+            "Enter customer name:",
+            parent=self.root,
+        )
+
+        if not customer_name:
+            messagebox.showwarning(
+                "Missing Customer Name",
+                "Customer name is required.",
+            )
+            return
+
+        self.output_text.delete("1.0", tk.END)
+        self.output_text.insert(
+            tk.END,
+            "Generating AI integration package...\n\n",
+        )
+
+        try:
+            result = generate_integration_package_from_file(
+                customer_name=customer_name,
+                source_type="csv",
+                file_path=self.selected_file,
+            )
+
+            self.output_text.delete("1.0", tk.END)
+            self.output_text.insert(
+                tk.END,
+                "AI INTEGRATION PACKAGE GENERATED\n",
+            )
+            self.output_text.insert(tk.END, "=" * 60 + "\n\n")
+            self.output_text.insert(
+                tk.END,
+                json.dumps(result, indent=4),
+            )
+
+            messagebox.showinfo(
+                "Success",
+                f"AI integration package created for {customer_name}.",
+            )
+
+        except Exception as error:
+            self.output_text.delete("1.0", tk.END)
+            self.output_text.insert(tk.END, "Error generating package:\n\n")
+            self.output_text.insert(tk.END, str(error))
+
+            messagebox.showerror(
+                "AI Package Error",
+                str(error),
+            )
+
+    def process_file(self):
         if not self.selected_file:
             messagebox.showwarning(
                 "No File Selected",
@@ -153,10 +200,6 @@ class ModulaIntegrationApp:
         self._display_result(result)
 
     def open_generated_xml(self):
-        """
-        Open the latest generated XML file.
-        """
-
         if not self.latest_output_path:
             messagebox.showwarning(
                 "No XML File",
@@ -176,10 +219,6 @@ class ModulaIntegrationApp:
         os.startfile(output_path)
 
     def open_profile_manager(self):
-        """
-        Open a profile manager window.
-        """
-
         profiles = self.profile_registry.get_profiles()
 
         profile_window = tk.Toplevel(self.root)
@@ -206,10 +245,6 @@ class ModulaIntegrationApp:
             profile_listbox.insert(tk.END, profile_name)
 
         def show_profile_details(event):
-            """
-            Display the selected profile JSON.
-            """
-
             selection = profile_listbox.curselection()
 
             if not selection:
@@ -219,15 +254,9 @@ class ModulaIntegrationApp:
             profile = profiles.get(profile_name, {})
 
             details_text.delete("1.0", tk.END)
-            details_text.insert(
-                tk.END,
-                f"Profile: {profile_name}\n",
-            )
+            details_text.insert(tk.END, f"Profile: {profile_name}\n")
             details_text.insert(tk.END, "=" * 60 + "\n\n")
-            details_text.insert(
-                tk.END,
-                json.dumps(profile, indent=4),
-            )
+            details_text.insert(tk.END, json.dumps(profile, indent=4))
 
         profile_listbox.bind(
             "<<ListboxSelect>>",
@@ -235,10 +264,6 @@ class ModulaIntegrationApp:
         )
 
     def _display_result(self, result: dict):
-        """
-        Display processing results.
-        """
-
         self.output_text.delete("1.0", tk.END)
 
         self.output_text.insert(

@@ -1,0 +1,42 @@
+{
+    "customer_name": "Fake ERP Customer",
+    "source_type": "sql",
+    "target_system": "Modula WMS",
+    "profile_type": "sql_mapping_profile",
+    "header_table": "SalesOrders",
+    "line_table": "SalesOrderLines",
+    "field_mappings": {
+        "order_id": {
+            "table_name": "SalesOrders",
+            "column_name": "OrderID"
+        },
+        "customer_name": {
+            "table_name": "SalesOrders",
+            "column_name": "CustomerName"
+        },
+        "ship_to_name": {
+            "table_name": "SalesOrders",
+            "column_name": "ShipToName"
+        },
+        "ship_to_address": {
+            "table_name": "SalesOrders",
+            "column_name": "ShipToAddress"
+        },
+        "item": {
+            "table_name": "SalesOrderLines",
+            "column_name": "ItemNumber"
+        },
+        "quantity": {
+            "table_name": "SalesOrderLines",
+            "column_name": "Quantity"
+        },
+        "location": {
+            "table_name": "SalesOrderLines",
+            "column_name": "LocationCode"
+        }
+    },
+    "notes": [
+        "Generated automatically from SQL schema interpretation.",
+        "Review table and column mappings before using in production."
+    ]
+}

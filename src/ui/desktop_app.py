@@ -20,7 +20,7 @@ class ModulaIntegrationApp:
     def __init__(self, root: tk.Tk):
         self.root = root
         self.root.title("Modula WMS Agentic AI Integration Builder")
-        self.root.geometry("950x820")
+        self.root.geometry("950x850")
 
         self.profile_registry = ProfileRegistry()
         self.workflow_manager = IntegrationWorkflowManager()
@@ -81,6 +81,13 @@ class ModulaIntegrationApp:
             self.root,
             text="View Registered Customer Profiles",
             command=self.open_profile_manager,
+            width=55,
+        ).pack(pady=5)
+
+        tk.Button(
+            self.root,
+            text="Review Customer Profile",
+            command=self.review_customer_profile,
             width=55,
         ).pack(pady=5)
 
@@ -304,6 +311,66 @@ class ModulaIntegrationApp:
             self.output_text.insert(tk.END, "SQL workflow error:\n\n")
             self.output_text.insert(tk.END, str(error))
             messagebox.showerror("SQL Workflow Error", str(error))
+
+    def review_customer_profile(self):
+        profile_path = filedialog.askopenfilename(
+            title="Select Customer Profile",
+            filetypes=[
+                ("JSON Files", "*.json"),
+                ("All Files", "*.*"),
+            ],
+            initialdir="configs/customers",
+        )
+
+        if not profile_path:
+            return
+
+        self.output_text.delete("1.0", tk.END)
+        self.output_text.insert(tk.END, "Reviewing customer profile...\n\n")
+
+        try:
+            result = self.workflow_manager.run_profile_review_workflow(
+                profile_path=profile_path,
+            )
+
+            self.output_text.delete("1.0", tk.END)
+            self.output_text.insert(tk.END, "PROFILE REVIEW COMPLETE\n")
+            self.output_text.insert(tk.END, "=" * 70 + "\n\n")
+            self.output_text.insert(
+                tk.END,
+                f"Readiness Score: {result.get('integration_readiness_score')}\n",
+            )
+            self.output_text.insert(
+                tk.END,
+                f"Risk Level: {result.get('risk_level')}\n",
+            )
+            self.output_text.insert(
+                tk.END,
+                f"Review Method: {result.get('review_method')}\n",
+            )
+            self.output_text.insert(
+                tk.END,
+                f"Output Path: {result.get('output_path')}\n\n",
+            )
+
+            self.output_text.insert(tk.END, "Full Result JSON\n")
+            self.output_text.insert(tk.END, "-" * 70 + "\n")
+            self.output_text.insert(tk.END, json.dumps(result, indent=4))
+
+            messagebox.showinfo(
+                "Profile Review Complete",
+                (
+                    "Profile review completed.\n\n"
+                    f"Readiness Score: "
+                    f"{result.get('integration_readiness_score')}"
+                ),
+            )
+
+        except Exception as error:
+            self.output_text.delete("1.0", tk.END)
+            self.output_text.insert(tk.END, "Profile review failed:\n\n")
+            self.output_text.insert(tk.END, str(error))
+            messagebox.showerror("Profile Review Error", str(error))
 
     def open_profile_manager(self):
         profiles = self.profile_registry.get_profiles()

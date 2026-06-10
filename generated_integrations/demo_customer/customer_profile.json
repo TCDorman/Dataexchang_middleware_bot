@@ -22,15 +22,15 @@
         "quantity": "required_numeric"
     },
     "mapping_confidence": {
-        "order_id": 98,
+        "order_id": 95,
         "customer_name": 90,
-        "item": 98,
-        "quantity": 97
+        "item": 95,
+        "quantity": 95
     },
     "mapping_notes": {
-        "order_id": "Direct match to a unique order identifier.",
-        "customer_name": "Matches customer name, optional for processing.",
-        "item": "Clear match to inventory item description.",
-        "quantity": "Matches numeric quantity required for order processing."
+        "order_id": "Matches common order identifier header.",
+        "customer_name": "Direct mapping, but optional in target system.",
+        "item": "Clearly matches item description header.",
+        "quantity": "Numeric quantity required for processing."
     }
 }

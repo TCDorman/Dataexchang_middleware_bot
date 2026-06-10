@@ -93,10 +93,51 @@ class ModulaIntegrationApp:
 
         try:
             result = self.workflow_manager.run_demo_workflow()
+            workflow_result = result.get("result", {})
+            package_result = workflow_result.get("package_result", {})
+            processing_result = workflow_result.get("processing_result", {})
+            export_result = workflow_result.get("export_result", {})
 
             self.output_text.delete("1.0", tk.END)
             self.output_text.insert(tk.END, "DEMO WORKFLOW COMPLETE\n")
             self.output_text.insert(tk.END, "=" * 70 + "\n\n")
+
+            self.output_text.insert(tk.END, "Demo Summary\n")
+            self.output_text.insert(tk.END, "-" * 70 + "\n")
+            self.output_text.insert(tk.END, f"Status: {result.get('status')}\n")
+            self.output_text.insert(tk.END, f"Demo File: {result.get('demo_file')}\n")
+            self.output_text.insert(
+                tk.END,
+                f"Customer: {workflow_result.get('customer_name')}\n",
+            )
+            self.output_text.insert(
+                tk.END,
+                f"Source Type: {workflow_result.get('source_type')}\n",
+            )
+            self.output_text.insert(
+                tk.END,
+                f"Integration Folder: {workflow_result.get('integration_folder')}\n",
+            )
+            self.output_text.insert(
+                tk.END,
+                f"Customer Profile: {package_result.get('registered_profile_path')}\n",
+            )
+            self.output_text.insert(
+                tk.END,
+                f"Orders Processed: {processing_result.get('orders_processed')}\n",
+            )
+            self.output_text.insert(
+                tk.END,
+                "Quality Score: "
+                f"{processing_result.get('validation_report', {}).get('quality_score')}\n",
+            )
+            self.output_text.insert(
+                tk.END,
+                f"XML Output: {export_result.get('output_path')}\n\n",
+            )
+
+            self.output_text.insert(tk.END, "Full Result JSON\n")
+            self.output_text.insert(tk.END, "-" * 70 + "\n")
             self.output_text.insert(tk.END, json.dumps(result, indent=4))
 
             if result.get("status") == "success":

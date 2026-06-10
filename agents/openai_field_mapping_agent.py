@@ -13,7 +13,8 @@ Purpose:
 import json
 import os
 from typing import Any
-
+from dotenv import load_dotenv
+load_dotenv()
 
 MODULA_FIELDS = [
     "order_id",

@@ -1,0 +1,36 @@
+{
+    "customer_name": "Demo Customer",
+    "source_type": "csv",
+    "target_system": "Modula WMS",
+    "target_format": "XML",
+    "header_signature": [
+        "OrderID",
+        "CustomerName",
+        "Item",
+        "Quantity"
+    ],
+    "field_mapping": {
+        "order_id": "OrderID",
+        "customer_name": "CustomerName",
+        "item": "Item",
+        "quantity": "Quantity"
+    },
+    "validation_rules": {
+        "order_id": "required",
+        "customer_name": "optional",
+        "item": "required",
+        "quantity": "required_numeric"
+    },
+    "mapping_confidence": {
+        "order_id": 98,
+        "customer_name": 90,
+        "item": 98,
+        "quantity": 97
+    },
+    "mapping_notes": {
+        "order_id": "Direct match to a unique order identifier.",
+        "customer_name": "Matches customer name, optional for processing.",
+        "item": "Clear match to inventory item description.",
+        "quantity": "Matches numeric quantity required for order processing."
+    }
+}

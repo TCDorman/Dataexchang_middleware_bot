@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Orders>
+    <Order>
+        <OrderID>DEMO-1001</OrderID>
+        <CustomerName>Ford</CustomerName>
+        <Lines>
+            <Line>
+                <Item>ABC123</Item>
+                <Quantity>5</Quantity>
+            </Line>
+            <Line>
+                <Item>XYZ789</Item>
+                <Quantity>2</Quantity>
+            </Line>
+        </Lines>
+    </Order>
+    <Order>
+        <OrderID>DEMO-1002</OrderID>
+        <CustomerName>GM</CustomerName>
+        <Lines>
+            <Line>
+                <Item>LMN456</Item>
+                <Quantity>10</Quantity>
+            </Line>
+        </Lines>
+    </Order>
+</Orders>

@@ -1,0 +1,42 @@
+{
+    "status": "success",
+    "ready_for_xml": true,
+    "validation_report": {
+        "business_rules_passed": true,
+        "business_rule_errors": [],
+        "data_quality_errors": [],
+        "data_quality_warnings": [],
+        "quality_score": 100,
+        "ready_for_xml": true
+    },
+    "orders_processed": 2,
+    "decision": {
+        "action": "generate_xml",
+        "reason": "Validation passed successfully."
+    },
+    "export_result": {
+        "status": "success",
+        "output_path": "data\\output\\modula_orders_20260610_094326.xml",
+        "orders_exported": 2
+    },
+    "source_file": "data\\demo\\demo_orders.csv",
+    "orders_loaded": 2,
+    "parser_used": "CsvOrderParser",
+    "profile_used": "demo_customer",
+    "history_record": {
+        "timestamp": "2026-06-10T09:43:26",
+        "status": "success",
+        "orders_processed": 2,
+        "ready_for_xml": true,
+        "quality_score": 100,
+        "decision_action": "generate_xml",
+        "decision_reason": "Validation passed successfully.",
+        "export_status": "success",
+        "output_path": "data\\output\\modula_orders_20260610_094326.xml",
+        "orders_exported": 2,
+        "source_file": "data\\demo\\demo_orders.csv",
+        "orders_loaded": 2,
+        "parser_used": "CsvOrderParser",
+        "profile_used": "demo_customer"
+    }
+}

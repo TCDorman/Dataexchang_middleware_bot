@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 
-from src.ai.field_mapping_agent import FieldMappingAgent
+from agents.openai_field_mapping_agent import infer_field_mapping_with_openai
 from src.ai.header_extraction_agent import HeaderExtractionAgent
 from src.ai.profile_generation_agent import ProfileGenerationAgent
 
@@ -46,43 +46,51 @@ def generate_config(customer_name: str, source_type: str) -> dict:
 
 
 def generate_default_mapping(source_fields: list[str] | None = None) -> dict:
-    target_fields = [
-        "order_id",
-        "customer_name",
-        "item",
-        "quantity",
-    ]
-
     if not source_fields:
         return {
             "order_id": "",
             "customer_name": "",
+            "ship_to_name": "",
+            "ship_to_address": "",
             "item": "",
             "quantity": "",
+            "location": "",
         }
 
-    agent = FieldMappingAgent()
-
-    return agent.suggest_mapping(
-        source_fields=source_fields,
-        target_fields=target_fields,
+    mapping_result = infer_field_mapping_with_openai(
+        source_columns=source_fields,
+        source_type="csv",
     )
+
+    return mapping_result.get("field_mapping", {})
 
 
 def generate_customer_profile(
     customer_name: str,
     source_type: str,
     source_fields: list[str],
-    mapping: dict,
+    mapping_result: dict,
 ) -> dict:
+    field_mapping = mapping_result.get("field_mapping", {})
+    mapping_confidence = mapping_result.get("mapping_confidence", {})
+    mapping_notes = mapping_result.get("mapping_notes", {})
+
     agent = ProfileGenerationAgent()
 
-    return agent.generate_profile(
+    profile = agent.generate_profile(
         customer_name=customer_name,
         source_type=source_type,
         headers=source_fields,
-        field_mapping=mapping,
+        field_mapping=field_mapping,
     )
+
+    profile["field_mapping"] = field_mapping
+    profile["mapping_confidence"] = mapping_confidence
+    profile["mapping_notes"] = mapping_notes
+    profile["mapping_method"] = mapping_result.get("mapping_method")
+    profile["fallback_reason"] = mapping_result.get("fallback_reason")
+
+    return profile
 
 
 def generate_readme(customer_name: str, source_type: str) -> str:
@@ -124,16 +132,32 @@ def generate_integration_package(
     readme_path = folder / "README.md"
 
     config = generate_config(customer_name, source_type)
-    mapping = generate_default_mapping(source_fields)
 
     if source_fields:
+        mapping_result = infer_field_mapping_with_openai(
+            source_columns=source_fields,
+            source_type=source_type,
+        )
+
+        mapping = mapping_result.get("field_mapping", {})
+
         customer_profile = generate_customer_profile(
             customer_name=customer_name,
             source_type=source_type,
             source_fields=source_fields,
-            mapping=mapping,
+            mapping_result=mapping_result,
         )
     else:
+        mapping_result = {
+            "mapping_method": "empty",
+            "fallback_reason": "No source fields provided.",
+            "field_mapping": generate_default_mapping(None),
+            "mapping_confidence": {},
+            "mapping_notes": {},
+        }
+
+        mapping = mapping_result["field_mapping"]
+
         customer_profile = {
             "customer_name": customer_name,
             "source_type": source_type,
@@ -144,6 +168,8 @@ def generate_integration_package(
             "validation_rules": {},
             "mapping_confidence": {},
             "mapping_notes": {},
+            "mapping_method": mapping_result.get("mapping_method"),
+            "fallback_reason": mapping_result.get("fallback_reason"),
         }
 
     readme = generate_readme(customer_name, source_type)
@@ -168,6 +194,7 @@ def generate_integration_package(
             str(readme_path),
         ],
         "mapping": mapping,
+        "mapping_result": mapping_result,
         "customer_profile": customer_profile,
     }
 

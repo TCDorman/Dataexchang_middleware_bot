@@ -886,5 +886,21 @@
         "orders_loaded": 2,
         "parser_used": "CsvOrderParser",
         "profile_used": "ew"
+    },
+    {
+        "timestamp": "2026-06-10T10:54:50",
+        "status": "success",
+        "orders_processed": 2,
+        "ready_for_xml": true,
+        "quality_score": 100,
+        "decision_action": "generate_xml",
+        "decision_reason": "Validation passed successfully.",
+        "export_status": "success",
+        "output_path": "data\\output\\modula_orders_20260610_105450.xml",
+        "orders_exported": 2,
+        "source_file": "data\\demo\\demo_orders.csv",
+        "orders_loaded": 2,
+        "parser_used": "CsvOrderParser",
+        "profile_used": "demo_customer"
     }
 ]

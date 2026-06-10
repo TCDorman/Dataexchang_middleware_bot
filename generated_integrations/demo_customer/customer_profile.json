@@ -12,8 +12,11 @@
     "field_mapping": {
         "order_id": "OrderID",
         "customer_name": "CustomerName",
+        "ship_to_name": null,
+        "ship_to_address": null,
         "item": "Item",
-        "quantity": "Quantity"
+        "quantity": "Quantity",
+        "location": null
     },
     "validation_rules": {
         "order_id": "required",
@@ -22,15 +25,23 @@
         "quantity": "required_numeric"
     },
     "mapping_confidence": {
-        "order_id": 95,
-        "customer_name": 90,
-        "item": 95,
-        "quantity": 95
+        "order_id": 85,
+        "customer_name": 85,
+        "ship_to_name": 0,
+        "ship_to_address": 0,
+        "item": 85,
+        "quantity": 85,
+        "location": 0
     },
     "mapping_notes": {
-        "order_id": "Matches common order identifier header.",
-        "customer_name": "Direct mapping, but optional in target system.",
-        "item": "Clearly matches item description header.",
-        "quantity": "Numeric quantity required for processing."
-    }
+        "order_id": "Rule-based fallback matched OrderID to order_id.",
+        "customer_name": "Rule-based fallback matched CustomerName to customer_name.",
+        "ship_to_name": "No confident rule-based match found.",
+        "ship_to_address": "No confident rule-based match found.",
+        "item": "Rule-based fallback matched Item to item.",
+        "quantity": "Rule-based fallback matched Quantity to quantity.",
+        "location": "No confident rule-based match found."
+    },
+    "mapping_method": "fallback_rule_based",
+    "fallback_reason": "OPENAI_API_KEY is not set."
 }

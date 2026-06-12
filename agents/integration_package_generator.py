@@ -65,6 +65,40 @@ def generate_default_mapping(source_fields: list[str] | None = None) -> dict:
     return mapping_result.get("field_mapping", {})
 
 
+def apply_confirmed_mapping_to_result(
+    mapping_result: dict,
+    confirmed_mapping: dict,
+) -> dict:
+    updated_mapping_result = dict(mapping_result)
+    updated_mapping_result["field_mapping"] = confirmed_mapping
+    updated_mapping_result["mapping_method"] = (
+        f"{mapping_result.get('mapping_method', 'unknown')}_confirmed"
+    )
+    updated_mapping_result["confirmed_by_user"] = True
+    updated_mapping_result["confirmed_at"] = datetime.now().isoformat(
+        timespec="seconds"
+    )
+
+    return updated_mapping_result
+
+
+def write_mapping_confirmation_file(
+    path: Path,
+    mapping_result: dict,
+    confirmed_mapping: dict,
+) -> dict:
+    confirmation_result = {
+        "status": "confirmed",
+        "confirmed_at": datetime.now().isoformat(timespec="seconds"),
+        "original_mapping_result": mapping_result,
+        "confirmed_field_mapping": confirmed_mapping,
+    }
+
+    write_json_file(path, confirmation_result)
+
+    return confirmation_result
+
+
 def generate_customer_profile(
     customer_name: str,
     source_type: str,
@@ -89,6 +123,8 @@ def generate_customer_profile(
     profile["mapping_notes"] = mapping_notes
     profile["mapping_method"] = mapping_result.get("mapping_method")
     profile["fallback_reason"] = mapping_result.get("fallback_reason")
+    profile["confirmed_by_user"] = mapping_result.get("confirmed_by_user", False)
+    profile["confirmed_at"] = mapping_result.get("confirmed_at")
 
     return profile
 
@@ -109,7 +145,8 @@ Modula WMS
 
 ## Files
 - config.json: customer integration settings
-- mapping.json: AI-suggested field mapping from customer file to Modula WMS fields
+- mapping.json: user-confirmed field mapping from customer file to Modula WMS fields
+- mapping_confirmation.json: audit trail of LLM suggestion and user confirmation
 - customer_profile.json: AI-generated customer profile with validation rules and mapping notes
 - configs/customers profile copy: registered profile used by the processing pipeline
 
@@ -122,22 +159,42 @@ def generate_integration_package(
     customer_name: str,
     source_type: str,
     source_fields: list[str] | None = None,
+    mapping_confirmation_callback=None,
 ) -> dict:
     folder = get_integration_folder(customer_name)
 
     config_path = folder / "config.json"
     mapping_path = folder / "mapping.json"
+    confirmation_path = folder / "mapping_confirmation.json"
     profile_path = folder / "customer_profile.json"
     registry_profile_path = get_registry_profile_path(customer_name)
     readme_path = folder / "README.md"
 
     config = generate_config(customer_name, source_type)
+    confirmation_result = None
 
     if source_fields:
         mapping_result = infer_field_mapping_with_openai(
             source_columns=source_fields,
             source_type=source_type,
         )
+
+        if mapping_confirmation_callback:
+            confirmed_mapping = mapping_confirmation_callback(mapping_result)
+
+            confirmation_result = write_mapping_confirmation_file(
+                path=confirmation_path,
+                mapping_result=mapping_result,
+                confirmed_mapping=confirmed_mapping,
+            )
+
+            mapping_result = apply_confirmed_mapping_to_result(
+                mapping_result=mapping_result,
+                confirmed_mapping=confirmed_mapping,
+            )
+        else:
+            mapping_result["confirmed_by_user"] = False
+            mapping_result["confirmed_at"] = None
 
         mapping = mapping_result.get("field_mapping", {})
 
@@ -154,6 +211,8 @@ def generate_integration_package(
             "field_mapping": generate_default_mapping(None),
             "mapping_confidence": {},
             "mapping_notes": {},
+            "confirmed_by_user": False,
+            "confirmed_at": None,
         }
 
         mapping = mapping_result["field_mapping"]
@@ -170,6 +229,8 @@ def generate_integration_package(
             "mapping_notes": {},
             "mapping_method": mapping_result.get("mapping_method"),
             "fallback_reason": mapping_result.get("fallback_reason"),
+            "confirmed_by_user": False,
+            "confirmed_at": None,
         }
 
     readme = generate_readme(customer_name, source_type)
@@ -180,21 +241,27 @@ def generate_integration_package(
     write_json_file(registry_profile_path, customer_profile)
     write_text_file(readme_path, readme)
 
+    files_created = [
+        str(config_path),
+        str(mapping_path),
+        str(profile_path),
+        str(registry_profile_path),
+        str(readme_path),
+    ]
+
+    if confirmation_result:
+        files_created.insert(2, str(confirmation_path))
+
     return {
         "status": "success",
         "customer_name": customer_name,
         "source_type": source_type,
         "integration_folder": str(folder),
         "registered_profile_path": str(registry_profile_path),
-        "files_created": [
-            str(config_path),
-            str(mapping_path),
-            str(profile_path),
-            str(registry_profile_path),
-            str(readme_path),
-        ],
+        "files_created": files_created,
         "mapping": mapping,
         "mapping_result": mapping_result,
+        "confirmation_result": confirmation_result,
         "customer_profile": customer_profile,
     }
 
@@ -203,6 +270,7 @@ def generate_integration_package_from_file(
     customer_name: str,
     source_type: str,
     file_path: str,
+    mapping_confirmation_callback=None,
 ) -> dict:
     header_agent = HeaderExtractionAgent()
 
@@ -212,6 +280,7 @@ def generate_integration_package_from_file(
         customer_name=customer_name,
         source_type=source_type,
         source_fields=source_fields,
+        mapping_confirmation_callback=mapping_confirmation_callback,
     )
 
 

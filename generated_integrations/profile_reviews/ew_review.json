@@ -1,0 +1,24 @@
+{
+    "status": "success",
+    "review_method": "openai",
+    "integration_readiness_score": 85,
+    "risk_level": "medium",
+    "missing_required_fields": [],
+    "missing_optional_fields": [
+        "ship_to_name",
+        "ship_to_address",
+        "location"
+    ],
+    "warnings": [
+        "Optional fields ship_to_name, ship_to_address, and location are missing from the field mapping and header signature. These may be important for complete order fulfillment and shipping accuracy.",
+        "Customer_name is marked optional but has a high mapping confidence; consider making it required if customer identification is critical."
+    ],
+    "recommendations": [
+        "Add ship_to_name, ship_to_address, and location fields to the source CSV and field mapping to improve shipping and inventory location accuracy.",
+        "Review if customer_name should be required to avoid missing customer identification in orders.",
+        "Validate that AmountRequested values are always numeric to prevent processing errors.",
+        "Consider adding data format validation for PO_ID and PartNumber to ensure data integrity."
+    ],
+    "summary": "The integration profile is well defined with strong field mappings and validation rules for required fields. However, missing optional but important shipping and location fields introduce medium risk. Enhancing the profile with these fields and tightening validation will improve readiness.",
+    "profile_path": "configs\\customers\\ew.json"
+}

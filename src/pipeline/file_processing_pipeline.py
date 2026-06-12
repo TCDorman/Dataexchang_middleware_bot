@@ -7,7 +7,7 @@ Pipeline Flow:
 
 Customer File
     ↓
-Profile Detection
+Profile Detection or Explicit Profile Selection
     ↓
 If No Profile Exists: AI Customer Onboarding
     ↓
@@ -30,6 +30,7 @@ XML Export
 Transaction History
 """
 
+from pathlib import Path
 from typing import Any, Dict, List
 
 from src.ai.customer_onboarding_agent import CustomerOnboardingAgent
@@ -45,10 +46,6 @@ class FileProcessingPipeline:
     """
 
     def __init__(self):
-        """
-        Initialize pipeline components.
-        """
-
         self.profile_detector = ProfileDetector()
         self.profile_loader = ProfileLoader()
         self.workflow_runner = WorkflowRunner()
@@ -60,47 +57,39 @@ class FileProcessingPipeline:
     ) -> Dict[str, Any]:
         """
         Process already-transformed orders.
-
-        Args:
-            orders: Internal order dictionaries.
-
-        Returns:
-            Full workflow result.
         """
 
         return self.workflow_runner.run(orders)
 
-    def process_file(self, file_path: str) -> Dict[str, Any]:
+    def process_file(
+        self,
+        file_path: str,
+        profile_path: str | None = None,
+    ) -> Dict[str, Any]:
         """
         Process a customer input file.
 
-        If no matching profile exists, the pipeline starts
-        AI-assisted customer onboarding.
-
-        Args:
-            file_path: Path to the customer file.
-
-        Returns:
-            Full workflow result or clean error result.
+        If profile_path is provided, the pipeline uses that exact profile.
+        Otherwise, it detects an existing profile or starts AI onboarding.
         """
 
         try:
-            # Step 1: Detect an existing profile or create one with AI.
-            profile_name = self._get_or_create_profile(file_path)
+            profile_name = None
 
-            # Step 2: Load the selected/generated customer profile.
-            profile = self.profile_loader.load_profile(profile_name)
+            if profile_path:
+                profile = self.profile_loader.load_profile_from_path(profile_path)
+                profile_name = self._profile_name_from_path(profile_path)
+            else:
+                profile_name = self._get_or_create_profile(file_path)
+                profile = self.profile_loader.load_profile(profile_name)
 
-            # Step 3: Select the correct parser based on file type.
             parser = ParserFactory.get_parser(file_path)
 
-            # Step 4: Parse file using the selected customer profile.
             orders = parser.parse(
                 file_path,
                 profile=profile,
             )
 
-            # Step 5: Run the parsed orders through the workflow.
             return self.workflow_runner.run(
                 orders,
                 metadata={
@@ -108,11 +97,11 @@ class FileProcessingPipeline:
                     "orders_loaded": len(orders),
                     "parser_used": type(parser).__name__,
                     "profile_used": profile_name,
+                    "profile_path": profile_path,
                 },
             )
 
         except Exception as error:
-            # Return a clean error response instead of crashing the app.
             return {
                 "status": "error",
                 "source_file": file_path,
@@ -135,20 +124,12 @@ class FileProcessingPipeline:
     ) -> str:
         """
         Detect an existing profile or create a new one using AI.
-
-        Args:
-            file_path: Customer input file.
-
-        Returns:
-            Profile name.
         """
 
         try:
-            # Try to detect an existing customer profile first.
             return self.profile_detector.detect_profile(file_path)
 
         except ValueError:
-            # If no profile exists, start the AI onboarding flow.
             print("\nNo matching customer profile found.")
             print("Starting AI-assisted customer onboarding.")
 
@@ -162,8 +143,13 @@ class FileProcessingPipeline:
             )
 
             if onboarding_result["status"] != "success":
-                raise ValueError(
-                    "Customer onboarding was cancelled."
-                )
+                raise ValueError("Customer onboarding was cancelled.")
 
             return onboarding_result["save_result"]["profile_name"]
+
+    def _profile_name_from_path(self, profile_path: str) -> str:
+        """
+        Extract profile name from a profile file path.
+        """
+
+        return Path(profile_path).stem

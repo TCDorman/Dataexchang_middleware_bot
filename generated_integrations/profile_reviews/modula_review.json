@@ -1,0 +1,21 @@
+{
+    "status": "success",
+    "review_method": "openai",
+    "integration_readiness_score": 85,
+    "risk_level": "medium",
+    "missing_required_fields": [],
+    "missing_optional_fields": [
+        "ship_to_name",
+        "ship_to_address",
+        "location"
+    ],
+    "warnings": [
+        "Optional but important fields 'ship_to_name', 'ship_to_address', and 'location' are missing from the header_signature and field_mapping. Including these fields can improve shipping accuracy and inventory location tracking."
+    ],
+    "recommendations": [
+        "Add 'ship_to_name', 'ship_to_address', and 'location' fields to the header_signature and field_mapping to enhance integration completeness.",
+        "Verify if 'customer_name' is always available; if not, consider making it optional but ensure downstream processes handle its absence gracefully."
+    ],
+    "summary": "The integration profile covers all required fields with high confidence and exact matches, but lacks several optional yet important fields that could improve operational efficiency and reduce risks.",
+    "profile_path": "configs\\customers\\modula.json"
+}

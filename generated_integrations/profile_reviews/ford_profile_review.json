@@ -1,0 +1,21 @@
+{
+    "status": "success",
+    "review_method": "openai",
+    "integration_readiness_score": 85,
+    "risk_level": "low",
+    "missing_required_fields": [],
+    "missing_optional_fields": [
+        "ship_to_name",
+        "ship_to_address",
+        "location"
+    ],
+    "warnings": [
+        "Optional fields ship_to_name, ship_to_address, and location are missing from the mapping which may limit shipment accuracy and traceability."
+    ],
+    "recommendations": [
+        "Consider adding mappings for ship_to_name, ship_to_address, and location to improve shipment processing and reduce potential errors.",
+        "Validate that the CSV source consistently includes all required headers to avoid integration failures."
+    ],
+    "summary": "The integration profile for Ford is well configured with all required fields mapped and present. Missing optional fields related to shipping details could be added to enhance functionality and reduce risks.",
+    "profile_path": "configs\\customers\\ford_profile.json"
+}

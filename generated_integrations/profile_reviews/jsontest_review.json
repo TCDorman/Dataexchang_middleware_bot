@@ -1,0 +1,22 @@
+{
+    "status": "success",
+    "review_method": "openai",
+    "integration_readiness_score": 90,
+    "risk_level": "low",
+    "missing_required_fields": [],
+    "missing_optional_fields": [
+        "ship_to_name",
+        "ship_to_address",
+        "location"
+    ],
+    "warnings": [
+        "Optional fields ship_to_name, ship_to_address, and location are missing from the field mapping. These may be important for full order fulfillment and shipping accuracy."
+    ],
+    "recommendations": [
+        "Consider adding mappings for ship_to_name, ship_to_address, and location to improve integration completeness and support shipping processes.",
+        "Validate that the 'quantity' field is always numeric as per the 'required_numeric' validation rule to avoid data errors.",
+        "Confirm that the XML target format structure aligns with Modula WMS requirements beyond header signature fields."
+    ],
+    "summary": "The integration profile is well defined with all required fields mapped and high confidence scores. Missing optional shipping-related fields should be addressed to enhance completeness and reduce operational risks.",
+    "profile_path": "configs\\customers\\jsontest.json"
+}

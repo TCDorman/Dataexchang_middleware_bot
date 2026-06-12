@@ -7,10 +7,17 @@
     "field_mapping": {
         "order_id": "",
         "customer_name": "",
+        "ship_to_name": "",
+        "ship_to_address": "",
         "item": "",
-        "quantity": ""
+        "quantity": "",
+        "location": ""
     },
     "validation_rules": {},
     "mapping_confidence": {},
-    "mapping_notes": {}
+    "mapping_notes": {},
+    "mapping_method": "empty",
+    "fallback_reason": "No source fields provided.",
+    "confirmed_by_user": false,
+    "confirmed_at": null
 }

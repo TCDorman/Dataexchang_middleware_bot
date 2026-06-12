@@ -1,0 +1,19 @@
+{
+    "status": "success",
+    "review_method": "openai",
+    "integration_readiness_score": 90,
+    "risk_level": "low",
+    "missing_required_fields": [],
+    "missing_optional_fields": [],
+    "warnings": [
+        "Ensure that the SQL tables 'SalesOrders' and 'SalesOrderLines' have consistent and matching keys for proper join operations.",
+        "Verify that the 'LocationCode' in 'SalesOrderLines' matches the expected location format in Modula WMS."
+    ],
+    "recommendations": [
+        "Add validation rules for quantity to prevent negative or zero values.",
+        "Confirm that all address fields meet Modula WMS formatting requirements.",
+        "Consider including additional optional fields like order date or shipping method if supported by Modula WMS for enhanced integration."
+    ],
+    "summary": "The integration profile is well-defined with all required and optional fields mapped. Minor validation and format checks are recommended to ensure smooth data transfer and compatibility with Modula WMS.",
+    "profile_path": "configs\\customers\\fake_erp_customer_sql_profile.json"
+}

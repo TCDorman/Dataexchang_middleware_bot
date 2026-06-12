@@ -8,20 +8,38 @@ from transformers.wms_xml_transformer import export_orders_to_xml
 
 
 if __name__ == "__main__":
-    print("Starting ERP CSV to WMS XML conversion...")
+
+    if len(sys.argv) < 3:
+        raise ValueError(
+            "Usage: python scripts/convert_erp_csv_to_wms_xml.py <header_csv_file> <line_csv_file>"
+        )
+
+    header_file_path = Path(sys.argv[1])
+    line_file_path = Path(sys.argv[2])
+
+    if not header_file_path.exists():
+        raise FileNotFoundError(f"Header CSV file not found: {header_file_path}")
+
+    if not line_file_path.exists():
+        raise FileNotFoundError(f"Line CSV file not found: {line_file_path}")
+
+    output_path = Path("data/output/customer_erp_orders_wms.xml")
+
+    print(f"Reading header file: {header_file_path}")
+    print(f"Reading line file: {line_file_path}")
 
     Path("data/output").mkdir(parents=True, exist_ok=True)
 
     orders = parse_erp_orders_csv(
-        "data/sample_files/customer_erp_order_headers.csv",
-        "data/sample_files/customer_erp_order_lines.csv",
+        str(header_file_path),
+        str(line_file_path),
     )
 
-    print(f"Parsed {len(orders)} orders")
+    print(f"Parsed {len(orders)} ERP orders")
 
     export_orders_to_xml(
         orders,
-        "data/output/customer_erp_orders_wms.xml",
+        output_path,
     )
 
-    print("Converted ERP CSV files to data/output/customer_erp_orders_wms.xml")
+    print(f"Generated {output_path}")

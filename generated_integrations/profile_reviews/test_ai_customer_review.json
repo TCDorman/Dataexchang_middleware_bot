@@ -1,0 +1,23 @@
+{
+    "status": "success",
+    "review_method": "openai",
+    "integration_readiness_score": 75,
+    "risk_level": "medium",
+    "missing_required_fields": [],
+    "missing_optional_fields": [
+        "ship_to_name",
+        "ship_to_address",
+        "location"
+    ],
+    "warnings": [
+        "Customer name is mapped but the profile customer_name is 'Unknown Customer', consider verifying the actual customer name.",
+        "Optional fields related to shipping details are missing from the header_signature and field_mapping."
+    ],
+    "recommendations": [
+        "Add 'ship_to_name', 'ship_to_address', and 'location' to the header_signature and field_mapping to improve integration completeness.",
+        "Confirm and update the 'customer_name' field to reflect the actual customer for better traceability.",
+        "Consider validating data types and formats for each field to ensure compatibility with Modula WMS."
+    ],
+    "summary": "The integration profile covers all required fields but lacks important optional shipping details and has an unspecified customer name, resulting in a medium risk level and moderate readiness score.",
+    "profile_path": "configs\\customers\\test_ai_customer.json"
+}

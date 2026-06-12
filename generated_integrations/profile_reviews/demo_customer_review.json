@@ -15,9 +15,9 @@
     ],
     "recommendations": [
         "Set the OPENAI_API_KEY to enable AI-assisted mapping for improved accuracy and confidence.",
-        "Consider mapping the optional fields ship_to_name, ship_to_address, and location to enhance data completeness and downstream processing.",
-        "Validate that the CSV header always includes all required fields to avoid integration failures."
+        "Consider mapping optional fields ship_to_name, ship_to_address, and location to enhance data completeness and downstream processing.",
+        "Validate that the CSV header always includes required fields to avoid runtime errors."
     ],
-    "summary": "The integration profile covers all required fields with good confidence but lacks mappings for several optional important fields. The fallback rule-based mapping approach introduces some risk. Addressing missing optional fields and enabling AI-assisted mapping will improve readiness.",
-    "profile_path": "C:\\Projects\\modula-integration-agent\\configs\\customers\\demo_customer.json"
+    "summary": "The integration profile covers all required fields with good confidence but lacks mappings for several optional yet important fields. The fallback rule-based mapping approach was used due to missing API key, which may impact accuracy. Addressing these gaps will improve readiness and reduce risk.",
+    "profile_path": "configs\\customers\\demo_customer.json"
 }

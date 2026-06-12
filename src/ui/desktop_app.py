@@ -92,6 +92,7 @@ class ModulaIntegrationApp:
             result = self.workflow_manager.run_file_workflow(
                 file_path=file_path,
                 customer_name=customer_name,
+                mapping_confirmation_callback=self.review_mapping_in_app,
             )
 
             self.output_text.delete("1.0", tk.END)
@@ -115,6 +116,125 @@ class ModulaIntegrationApp:
             self.output_text.insert(tk.END, "Workflow failed:\n\n")
             self.output_text.insert(tk.END, str(error))
             messagebox.showerror("Workflow Error", str(error))
+
+    def review_mapping_in_app(self, mapping_result: dict) -> dict:
+        messagebox.showinfo(
+            "LLM Mapping Suggestions Ready",
+            "The LLM suggested field mappings. Please review and confirm them.",
+        )
+
+        dialog = tk.Toplevel(self.root)
+        dialog.title("Confirm Field Mappings")
+        dialog.geometry("950x575")
+        dialog.grab_set()
+
+        tk.Label(
+            dialog,
+            text="Review and Confirm LLM-Suggested Field Mappings",
+            font=("Arial", 14, "bold"),
+        ).pack(pady=10)
+
+        tk.Label(
+            dialog,
+            text="Edit the customer field values if needed, then click Confirm Mappings.",
+            font=("Arial", 10),
+        ).pack(pady=5)
+
+        frame = tk.Frame(dialog)
+        frame.pack(fill=tk.BOTH, expand=True, padx=15, pady=10)
+
+        field_mapping = mapping_result.get("field_mapping", {})
+        mapping_confidence = mapping_result.get("mapping_confidence", {})
+        mapping_notes = mapping_result.get("mapping_notes", {})
+
+        entries = {}
+
+        header = tk.Frame(frame)
+        header.pack(fill=tk.X, pady=5)
+
+        tk.Label(
+            header,
+            text="Modula Field",
+            width=25,
+            anchor="w",
+            font=("Arial", 10, "bold"),
+        ).pack(side=tk.LEFT)
+
+        tk.Label(
+            header,
+            text="Suggested Customer Field",
+            width=30,
+            anchor="w",
+            font=("Arial", 10, "bold"),
+        ).pack(side=tk.LEFT)
+
+        tk.Label(
+            header,
+            text="Confidence",
+            width=12,
+            anchor="w",
+            font=("Arial", 10, "bold"),
+        ).pack(side=tk.LEFT)
+
+        tk.Label(
+            header,
+            text="Reason",
+            width=50,
+            anchor="w",
+            font=("Arial", 10, "bold"),
+        ).pack(side=tk.LEFT)
+
+        for modula_field, suggested_field in field_mapping.items():
+            row = tk.Frame(frame)
+            row.pack(fill=tk.X, pady=4)
+
+            tk.Label(
+                row,
+                text=modula_field,
+                width=25,
+                anchor="w",
+            ).pack(side=tk.LEFT)
+
+            entry = tk.Entry(row, width=30)
+            entry.insert(0, suggested_field or "")
+            entry.pack(side=tk.LEFT, padx=5)
+            entries[modula_field] = entry
+
+            tk.Label(
+                row,
+                text=str(mapping_confidence.get(modula_field, "")),
+                width=12,
+                anchor="w",
+            ).pack(side=tk.LEFT)
+
+            tk.Label(
+                row,
+                text=mapping_notes.get(modula_field, ""),
+                width=50,
+                anchor="w",
+                wraplength=375,
+            ).pack(side=tk.LEFT)
+
+        confirmed_mapping = {}
+
+        def confirm():
+            for modula_field, entry in entries.items():
+                value = entry.get().strip()
+                confirmed_mapping[modula_field] = value if value else None
+
+            dialog.destroy()
+
+        tk.Button(
+            dialog,
+            text="Confirm Mappings",
+            command=confirm,
+            width=25,
+            height=2,
+        ).pack(pady=15)
+
+        self.root.wait_window(dialog)
+
+        return confirmed_mapping
 
     def run_sql_integration(self):
         generate_xml = messagebox.askyesno(

@@ -1,0 +1,24 @@
+{
+    "status": "success",
+    "review_method": "openai",
+    "integration_readiness_score": 90,
+    "risk_level": "medium",
+    "missing_required_fields": [],
+    "missing_optional_fields": [
+        "ship_to_name",
+        "ship_to_address",
+        "location"
+    ],
+    "warnings": [
+        "Optional but important fields 'ship_to_name', 'ship_to_address', and 'location' are missing from the field mapping and header signature.",
+        "Customer name is marked as optional but is included in the mapping; ensure this aligns with business needs."
+    ],
+    "recommendations": [
+        "Consider adding 'ship_to_name', 'ship_to_address', and 'location' fields to the source CSV and mapping to improve integration completeness.",
+        "Validate that the 'quantity' field is always numeric as per the 'required_numeric' validation rule.",
+        "Review if 'customer_name' should be required rather than optional to avoid potential data gaps.",
+        "Ensure the XML target format schema supports all mapped fields and optional fields when added."
+    ],
+    "summary": "The integration profile is well-defined with high confidence mappings for required fields. However, missing optional but important fields and potential validation gaps suggest a medium risk level and room for improvement.",
+    "profile_path": "configs\\customers\\acme.json"
+}

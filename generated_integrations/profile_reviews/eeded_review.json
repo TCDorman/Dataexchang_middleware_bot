@@ -1,0 +1,22 @@
+{
+    "status": "success",
+    "review_method": "openai",
+    "integration_readiness_score": 90,
+    "risk_level": "low",
+    "missing_required_fields": [],
+    "missing_optional_fields": [
+        "ship_to_name",
+        "ship_to_address",
+        "location"
+    ],
+    "warnings": [
+        "Optional fields 'ship_to_name', 'ship_to_address', and 'location' are missing from the mapping which may limit shipping and location-specific processing in Modula WMS."
+    ],
+    "recommendations": [
+        "Consider adding mappings for 'ship_to_name', 'ship_to_address', and 'location' to enhance shipping accuracy and inventory location tracking.",
+        "Verify if 'customer_name' is truly optional for your WMS processes; if customer-specific handling is needed, ensure it is always provided.",
+        "Ensure the CSV header matches exactly the expected header_signature to avoid parsing errors."
+    ],
+    "summary": "The integration profile is well-defined with all required fields mapped and validated. Missing optional fields related to shipping and location should be considered to improve overall WMS functionality.",
+    "profile_path": "configs\\customers\\eeded.json"
+}

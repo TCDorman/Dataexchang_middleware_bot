@@ -1,0 +1,23 @@
+{
+    "status": "success",
+    "review_method": "openai",
+    "integration_readiness_score": 90,
+    "risk_level": "low",
+    "missing_required_fields": [],
+    "missing_optional_fields": [
+        "ship_to_name",
+        "ship_to_address",
+        "location"
+    ],
+    "warnings": [
+        "Customer name field is marked optional but has a lower confidence mapping (90%), which may cause occasional mismatches.",
+        "Optional shipping and location fields are missing; if these are needed for downstream processes, their absence could cause issues."
+    ],
+    "recommendations": [
+        "Consider adding 'ship_to_name', 'ship_to_address', and 'location' fields to the integration profile if shipping details are relevant.",
+        "Validate the 'customer_name' field values to handle possible variations or inconsistencies.",
+        "Ensure numeric validation for 'quantity' is strictly enforced to prevent data errors."
+    ],
+    "summary": "The integration profile is well-defined with all required fields mapped and high confidence. Missing optional shipping and location fields should be reviewed for completeness depending on business needs.",
+    "profile_path": "configs\\customers\\te.json"
+}

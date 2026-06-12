@@ -1,0 +1,15 @@
+{
+    "status": "error",
+    "source_file": "C:/Projects/modula-integration-agent/data/customer_input/testfile.csv",
+    "error_message": "'ProfileLoader' object has no attribute 'load_profile_from_path'",
+    "orders_loaded": 0,
+    "decision": {
+        "action": "stop_processing",
+        "reason": "Pipeline error occurred."
+    },
+    "export_result": {
+        "status": "skipped",
+        "output_path": null,
+        "orders_exported": 0
+    }
+}

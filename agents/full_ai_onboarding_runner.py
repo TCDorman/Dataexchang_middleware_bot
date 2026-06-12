@@ -25,11 +25,13 @@ def run_full_ai_onboarding(
     customer_name: str,
     source_type: str,
     file_path: str,
+    mapping_confirmation_callback=None,
 ) -> dict:
     package_result = generate_integration_package_from_file(
         customer_name=customer_name,
         source_type=source_type,
         file_path=file_path,
+        mapping_confirmation_callback=mapping_confirmation_callback,
     )
 
     integration_folder = Path(package_result["integration_folder"])
@@ -38,8 +40,13 @@ def run_full_ai_onboarding(
     source_copy_path = integration_folder / Path(file_path).name
     shutil.copy(file_path, source_copy_path)
 
+    registered_profile_path = package_result.get("registered_profile_path")
+
     pipeline = FileProcessingPipeline()
-    processing_result = pipeline.process_file(file_path)
+    processing_result = pipeline.process_file(
+        file_path=file_path,
+        profile_path=registered_profile_path,
+    )
 
     export_result = processing_result.get("export_result", {})
     xml_output_path = export_result.get("output_path")
@@ -60,6 +67,7 @@ def run_full_ai_onboarding(
         "source_type": source_type,
         "integration_folder": str(integration_folder),
         "source_copy_path": str(source_copy_path),
+        "registered_profile_path": registered_profile_path,
         "original_xml_output_path": xml_output_path,
         "converted_xml_path": copied_xml_path,
         "processing_result_path": str(processing_result_path),

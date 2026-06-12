@@ -7,12 +7,10 @@ Central workflow router for the Modula WMS Data Integration Agent.
 from pathlib import Path
 
 from agents.api_documentation_analyzer import analyze_api_documentation_file
-from agents.demo_workflow_agent import run_demo_workflow
 from agents.full_ai_onboarding_runner import run_full_ai_onboarding
 from agents.live_sql_to_modula_xml_agent import generate_modula_xml_from_live_sql
 from agents.sql_connection_analyzer import analyze_sql_connection_string
 from src.connectors.source_detector import SourceDetector
-from agents.openai_profile_review_agent import review_customer_profile
 
 
 class IntegrationWorkflowManager:
@@ -22,6 +20,7 @@ class IntegrationWorkflowManager:
         self,
         file_path: str,
         customer_name: str,
+        mapping_confirmation_callback=None,
     ) -> dict:
         source_type = self.detect_source_kind(file_path)
 
@@ -33,6 +32,7 @@ class IntegrationWorkflowManager:
                 customer_name=customer_name,
                 source_type=source_type,
                 file_path=file_path,
+                mapping_confirmation_callback=mapping_confirmation_callback,
             )
 
         return {
@@ -57,9 +57,6 @@ class IntegrationWorkflowManager:
             profile_path=profile_path,
         )
 
-    def run_demo_workflow(self) -> dict:
-        return run_demo_workflow()
-
     def detect_source_kind(self, file_path: str) -> str:
         suffix = Path(file_path).suffix.lower()
 
@@ -70,8 +67,7 @@ class IntegrationWorkflowManager:
             return "api_documentation"
 
         return SourceDetector.detect_source_type(file_path)
-    def run_profile_review_workflow(self, profile_path: str) -> dict:
-        return review_customer_profile(profile_path)
+
     def _is_openapi_json(self, file_path: str) -> bool:
         import json
 

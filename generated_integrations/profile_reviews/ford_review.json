@@ -1,0 +1,31 @@
+{
+    "status": "success",
+    "review_method": "openai",
+    "integration_readiness_score": 40,
+    "risk_level": "high",
+    "missing_required_fields": [
+        "order_id",
+        "item",
+        "quantity"
+    ],
+    "missing_optional_fields": [
+        "customer_name",
+        "ship_to_name",
+        "ship_to_address",
+        "location"
+    ],
+    "warnings": [
+        "All required fields have empty mappings, which will prevent successful data integration.",
+        "No header signature is defined, which may cause issues in CSV parsing.",
+        "Validation rules are not specified, increasing risk of data quality issues."
+    ],
+    "recommendations": [
+        "Map all required fields ('order_id', 'item', 'quantity') to appropriate source CSV columns.",
+        "Include optional but important fields to enhance integration completeness and accuracy.",
+        "Define header signature to ensure correct CSV file structure recognition.",
+        "Implement validation rules to enforce data integrity before integration.",
+        "Provide mapping confidence and notes to document assumptions and improve maintainability."
+    ],
+    "summary": "The integration profile lacks essential field mappings and validation rules, resulting in a high risk of failure. Significant improvements are needed to meet integration readiness.",
+    "profile_path": "configs\\customers\\ford.json"
+}

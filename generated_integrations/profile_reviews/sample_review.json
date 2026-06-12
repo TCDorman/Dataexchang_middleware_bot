@@ -1,0 +1,27 @@
+{
+    "status": "success",
+    "review_method": "openai",
+    "integration_readiness_score": 65,
+    "risk_level": "medium",
+    "missing_required_fields": [],
+    "missing_optional_fields": [
+        "ship_to_name",
+        "ship_to_address",
+        "location"
+    ],
+    "warnings": [
+        "Field mapping uses top-level OpenAPI spec keys ('openapi', 'info', 'paths') which may not directly correspond to order data fields expected by Modula WMS.",
+        "Mapping 'order_id' to 'openapi' is unusual since 'openapi' is typically a version string, not an order identifier.",
+        "Both 'item' and 'quantity' map to 'paths', which is a complex object; no clear subfield specified for these required fields, risking incorrect data extraction.",
+        "Optional but important fields like 'ship_to_name', 'ship_to_address', and 'location' are missing from the field mapping, which may impact downstream processing or shipping accuracy."
+    ],
+    "recommendations": [
+        "Clarify and specify exact JSON paths or keys within 'paths' for 'item' and 'quantity' to ensure accurate data extraction.",
+        "Reconsider mapping 'order_id' to 'openapi'; identify a more appropriate JSON field that uniquely identifies orders.",
+        "Add mappings for optional but important fields such as 'ship_to_name', 'ship_to_address', and 'location' to improve integration completeness.",
+        "Validate that the source JSON structure aligns with these mappings or adjust the profile to match the actual data schema.",
+        "Perform test data exchanges to verify that the XML output meets Modula WMS requirements and adjust mappings accordingly."
+    ],
+    "summary": "The integration profile shows moderate readiness but has key mapping ambiguities and missing optional fields that increase risk. Clarifying JSON paths and expanding field mappings will improve integration reliability.",
+    "profile_path": "configs\\customers\\sample.json"
+}

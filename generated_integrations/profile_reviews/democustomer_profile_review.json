@@ -1,0 +1,23 @@
+{
+    "status": "success",
+    "review_method": "openai",
+    "integration_readiness_score": 85,
+    "risk_level": "low",
+    "missing_required_fields": [],
+    "missing_optional_fields": [
+        "customer_name",
+        "ship_to_name",
+        "ship_to_address",
+        "location"
+    ],
+    "warnings": [
+        "Optional but important fields are missing from the profile which may affect downstream processing or reporting."
+    ],
+    "recommendations": [
+        "Include optional fields such as customer_name, ship_to_name, ship_to_address, and location in the integration to improve data completeness and operational efficiency.",
+        "Verify that the approved_mapping_path correctly maps all required fields from the CSV source to the WMS XML output format.",
+        "Ensure the output path and format are consistent with Modula WMS expectations to avoid processing errors."
+    ],
+    "summary": "The integration profile is well configured with all required fields present and a valid output format. However, missing optional fields could limit functionality. Overall readiness is high with low risk.",
+    "profile_path": "configs\\customers\\democustomer_profile.json"
+}

@@ -1,0 +1,49 @@
+{
+    "customer_name": "PELS",
+    "source_type": "csv",
+    "target_system": "Modula WMS",
+    "target_format": "XML",
+    "header_signature": [
+        "Order Number",
+        "Customer",
+        "SKU",
+        "Qty"
+    ],
+    "field_mapping": {
+        "order_id": "Order Number",
+        "customer_name": "Customer",
+        "ship_to_name": null,
+        "ship_to_address": null,
+        "item": "SKU",
+        "quantity": "Qty",
+        "location": null
+    },
+    "validation_rules": {
+        "order_id": "required",
+        "customer_name": "optional",
+        "item": "required",
+        "quantity": "required_numeric"
+    },
+    "mapping_confidence": {
+        "order_id": 95,
+        "customer_name": 90,
+        "ship_to_name": 0,
+        "ship_to_address": 0,
+        "item": 95,
+        "quantity": 95,
+        "location": 0
+    },
+    "mapping_notes": {
+        "order_id": "Mapped to 'Order Number' as it clearly represents the order identifier.",
+        "customer_name": "Mapped to 'Customer' as it likely represents the customer's name.",
+        "ship_to_name": "No matching source column found for shipping recipient name.",
+        "ship_to_address": "No matching source column found for shipping address.",
+        "item": "Mapped to 'SKU' which represents the stock keeping unit or item identifier.",
+        "quantity": "Mapped to 'Qty' which represents the quantity ordered.",
+        "location": "No matching source column found for location information."
+    },
+    "mapping_method": "openai_confirmed",
+    "fallback_reason": null,
+    "confirmed_by_user": true,
+    "confirmed_at": "2026-06-12T09:53:26"
+}

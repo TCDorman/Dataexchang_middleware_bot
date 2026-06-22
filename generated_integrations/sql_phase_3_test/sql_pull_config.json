@@ -1,0 +1,6 @@
+{
+    "connection_string": "C:\\Projects\\modula-integration-agent\\data\\test_sql\\sql_package_test.db",
+    "database_type": "sqlite",
+    "query": "SELECT order_id, customer_name, item, quantity FROM source_orders",
+    "output_path": "C:\\Projects\\modula-integration-agent\\generated_integrations\\sql_phase_3_test\\data\\sql_pull_output.json"
+}

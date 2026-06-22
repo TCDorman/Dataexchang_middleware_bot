@@ -17,6 +17,7 @@ sys.path.append(str(PROJECT_ROOT))
 
 from agents.integration_workflow_manager import IntegrationWorkflowManager
 from agents.rest_api_integration_workflow import RestApiIntegrationWorkflow
+from agents.sql_integration_workflow import SQLIntegrationWorkflow
 from agents.rest_profile_generator import save_rest_profile
 from agents.customer_local_app_generator import generate_customer_local_app
 from agents.agents.customer_order_export_agent import (
@@ -35,6 +36,7 @@ class ModulaIntegrationApp:
 
         self.workflow_manager = IntegrationWorkflowManager()
         self.rest_api_workflow = RestApiIntegrationWorkflow()
+        self.sql_integration_workflow = SQLIntegrationWorkflow()
 
         self._build_ui()
 
@@ -109,7 +111,8 @@ class ModulaIntegrationApp:
                 "1 = Upload File / REST API Documentation\n"
                 "2 = Connect to Live REST API\n"
                 "3 = SQL / ODBC Integration\n"
-                "4 = Generate REST Integration Package"
+                "4 = Generate REST Integration Package\n"
+                "5 = Generate SQL Integration Package"
             ),
             parent=self.root,
         )
@@ -127,10 +130,12 @@ class ModulaIntegrationApp:
             self.run_sql_integration()
         elif choice == "4":
             self.generate_rest_integration_package_ui()
+        elif choice == "5":
+            self.generate_sql_integration_package_ui()
         else:
             messagebox.showwarning(
                 "Invalid Choice",
-                "Please enter 1, 2, 3, or 4.",
+                "Please enter 1, 2, 3, 4, or 5.",
             )
 
     def generate_rest_integration_package_ui(self):
@@ -231,6 +236,127 @@ class ModulaIntegrationApp:
             self.output_text.insert(tk.END, "REST package generation failed:\n\n")
             self.output_text.insert(tk.END, str(error))
             messagebox.showerror("REST Package Error", str(error))
+
+    def generate_sql_integration_package_ui(self):
+        customer_name = simpledialog.askstring(
+            "SQL Integration Package",
+            "Enter customer name:",
+            parent=self.root,
+        )
+
+        if not customer_name:
+            return
+
+        database_type = simpledialog.askstring(
+            "Database Type",
+            "Enter database type: sqlite, sql_server, or odbc",
+            parent=self.root,
+        )
+
+        if not database_type:
+            database_type = "sqlite"
+
+        database_type = database_type.strip().lower()
+
+        connection_string = simpledialog.askstring(
+            "Connection String",
+            "Enter SQL connection string. For SQLite, enter the .db file path:",
+            parent=self.root,
+        )
+
+        if not connection_string:
+            return
+
+        pull_query = simpledialog.askstring(
+            "Pull Query",
+            "Enter SQL SELECT query for the pull runner:",
+            parent=self.root,
+        )
+
+        if not pull_query:
+            return
+
+        push_source_path = filedialog.askopenfilename(
+            title="Select CSV or JSON Source File For SQL Push",
+            filetypes=[
+                ("Supported Files", "*.csv *.json"),
+                ("CSV Files", "*.csv"),
+                ("JSON Files", "*.json"),
+                ("All Files", "*.*"),
+            ],
+        )
+
+        if not push_source_path:
+            return
+
+        push_target_table = simpledialog.askstring(
+            "Target Table",
+            "Enter destination SQL table name:",
+            parent=self.root,
+        )
+
+        if not push_target_table:
+            return
+
+        mapping_text = simpledialog.askstring(
+            "SQL Push Field Mapping",
+            (
+                "Enter SQL push field mapping as JSON.\n\n"
+                "Example:\n"
+                '{'
+                '"order_id":"order_id", '
+                '"customer_name":"customer_name", '
+                '"item":"item", '
+                '"quantity":"quantity"'
+                '}'
+            ),
+            parent=self.root,
+        )
+
+        if not mapping_text:
+            return
+
+        try:
+            push_field_mapping = json.loads(mapping_text)
+        except json.JSONDecodeError as error:
+            messagebox.showerror(
+                "Invalid JSON",
+                f"Field mapping was not valid JSON:\n{error}",
+            )
+            return
+
+        self.output_text.delete("1.0", tk.END)
+        self.output_text.insert(
+            tk.END,
+            "Generating SQL integration package...\n\n",
+        )
+
+        try:
+            result = self.sql_integration_workflow.generate_manual_package(
+                customer_name=customer_name,
+                connection_string=connection_string,
+                database_type=database_type,
+                pull_query=pull_query,
+                push_source_path=push_source_path,
+                push_target_table=push_target_table,
+                push_field_mapping=push_field_mapping,
+            )
+
+            self.output_text.delete("1.0", tk.END)
+            self.output_text.insert(tk.END, "SQL INTEGRATION PACKAGE COMPLETE\n")
+            self.output_text.insert(tk.END, "=" * 70 + "\n\n")
+            self.output_text.insert(tk.END, json.dumps(result, indent=4))
+
+            messagebox.showinfo(
+                "SQL Package Generated",
+                f"SQL package generated for {customer_name}.",
+            )
+
+        except Exception as error:
+            self.output_text.delete("1.0", tk.END)
+            self.output_text.insert(tk.END, "SQL package generation failed:\n\n")
+            self.output_text.insert(tk.END, str(error))
+            messagebox.showerror("SQL Package Error", str(error))
 
     def show_existing_tools_menu(self):
         choice = simpledialog.askstring(

@@ -1,0 +1,12 @@
+{
+    "connection_string": "C:\\Projects\\modula-integration-agent\\data\\test_sql\\sql_package_test.db",
+    "database_type": "sqlite",
+    "source_path": "C:\\Projects\\modula-integration-agent\\data\\test_sql\\sql_push_source.csv",
+    "target_table": "target_orders",
+    "field_mapping": {
+        "order_id": "order_id",
+        "customer_name": "customer_name",
+        "item": "item",
+        "quantity": "quantity"
+    }
+}

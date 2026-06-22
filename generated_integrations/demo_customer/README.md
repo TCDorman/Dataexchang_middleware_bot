@@ -1,9 +1,9 @@
-# Demo Customer Integration Package
+# DEMO CUSTOMER Integration Package
 
 This folder was generated automatically by the Modula WMS Data Integration Agent.
 
 ## Customer
-Demo Customer
+DEMO CUSTOMER
 
 ## Source Type
 csv
@@ -13,7 +13,8 @@ Modula WMS
 
 ## Files
 - config.json: customer integration settings
-- mapping.json: AI-suggested field mapping from customer file to Modula WMS fields
+- mapping.json: user-confirmed field mapping from customer file to Modula WMS fields
+- mapping_confirmation.json: audit trail of LLM suggestion and user confirmation
 - customer_profile.json: AI-generated customer profile with validation rules and mapping notes
 - configs/customers profile copy: registered profile used by the processing pipeline
 

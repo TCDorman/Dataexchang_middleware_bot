@@ -1,0 +1,14 @@
+{
+    "customer_name": "REST Order Multiline Test",
+    "source_type": "rest_api",
+    "field_mapping": {
+        "order_id": "orderNumber",
+        "description": "orderDescription",
+        "operation_type": "operationType",
+        "lines": {
+            "path": "lines",
+            "item": "itemCode",
+            "quantity": "quantity"
+        }
+    }
+}

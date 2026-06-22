@@ -1,31 +1,23 @@
 {
     "status": "success",
     "review_method": "openai",
-    "integration_readiness_score": 40,
-    "risk_level": "high",
-    "missing_required_fields": [
-        "order_id",
-        "item",
-        "quantity"
-    ],
+    "integration_readiness_score": 75,
+    "risk_level": "medium",
+    "missing_required_fields": [],
     "missing_optional_fields": [
-        "customer_name",
         "ship_to_name",
         "ship_to_address",
         "location"
     ],
     "warnings": [
-        "All required fields have empty mappings, which will prevent successful data integration.",
-        "No header signature is defined, which may cause issues in CSV parsing.",
-        "Validation rules are not specified, increasing risk of data quality issues."
+        "Several optional but important fields (ship_to_name, ship_to_address, location) are missing from the source CSV and set to null in the mapping. This may limit the completeness of shipping and inventory location data in Modula WMS.",
+        "The integration has not been confirmed by the user yet, which may delay deployment or cause misunderstandings."
     ],
     "recommendations": [
-        "Map all required fields ('order_id', 'item', 'quantity') to appropriate source CSV columns.",
-        "Include optional but important fields to enhance integration completeness and accuracy.",
-        "Define header signature to ensure correct CSV file structure recognition.",
-        "Implement validation rules to enforce data integrity before integration.",
-        "Provide mapping confidence and notes to document assumptions and improve maintainability."
+        "Consider adding source columns or alternative data feeds for ship_to_name, ship_to_address, and location to improve data completeness and operational accuracy.",
+        "Obtain user confirmation on the mapping to ensure alignment and reduce risk of errors during integration.",
+        "Validate numeric quantity values thoroughly to prevent data quality issues."
     ],
-    "summary": "The integration profile lacks essential field mappings and validation rules, resulting in a high risk of failure. Significant improvements are needed to meet integration readiness.",
+    "summary": "The integration profile is mostly complete for required fields with high confidence mappings, but missing several optional fields important for full operational use. User confirmation and addressing missing optional fields will improve readiness and reduce risk.",
     "profile_path": "configs\\customers\\ford.json"
 }

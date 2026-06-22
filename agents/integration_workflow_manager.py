@@ -10,6 +10,7 @@ from agents.api_documentation_analyzer import analyze_api_documentation_file
 from agents.full_ai_onboarding_runner import run_full_ai_onboarding
 from agents.live_sql_to_modula_xml_agent import generate_modula_xml_from_live_sql
 from agents.sql_connection_analyzer import analyze_sql_connection_string
+from agents.openai_mapping_agent import infer_mapping_with_openai
 from src.connectors.source_detector import SourceDetector
 
 
@@ -39,6 +40,54 @@ class IntegrationWorkflowManager:
             "status": "error",
             "message": f"Unsupported source type: {source_type}",
             "file_path": file_path,
+        }
+
+    def run_live_rest_api_workflow(
+        self,
+        base_url: str,
+        endpoint: str,
+        auth_type: str = "none",
+        api_key: str | None = None,
+        api_key_header: str = "Authorization",
+        bearer_token: str | None = None,
+        username: str | None = None,
+        password: str | None = None,
+    ) -> dict:
+        from src.connectors.api_client import APIClient
+        from src.connectors.sample_analyzer import SampleAnalyzer
+        from src.connectors.response_normalizer import ResponseNormalizer
+
+        client = APIClient(
+            base_url=base_url,
+            auth_type=auth_type,
+            api_key=api_key,
+            api_key_header=api_key_header,
+            bearer_token=bearer_token,
+            username=username,
+            password=password,
+        )
+
+        payload = client.get(endpoint)
+
+        schema = SampleAnalyzer().analyze(payload)
+        normalized = ResponseNormalizer().normalize(schema)
+
+        fields = [
+            field["source_field"]
+            for field in normalized["fields"]
+        ]
+
+        mapping_result = infer_mapping_with_openai(fields)
+
+        return {
+            "status": "success",
+            "source_type": "live_rest_api",
+            "base_url": base_url,
+            "endpoint": endpoint,
+            "auth_type": auth_type,
+            "raw_response": payload,
+            "normalized_schema": normalized,
+            "mapping_result": mapping_result,
         }
 
     def run_sql_analysis_workflow(
@@ -75,10 +124,13 @@ class IntegrationWorkflowManager:
             with open(file_path, "r", encoding="utf-8") as file:
                 data = json.load(file)
 
-            return isinstance(data, dict) and (
-                "openapi" in data
-                or "swagger" in data
-                or "paths" in data
+            return (
+                isinstance(data, dict)
+                and (
+                    "openapi" in data
+                    or "swagger" in data
+                    or "paths" in data
+                )
             )
 
         except Exception:

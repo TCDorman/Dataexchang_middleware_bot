@@ -16,15 +16,16 @@
     },
     "export_result": {
         "status": "success",
-        "output_path": "data\\output\\modula_orders_20260610_105450.xml",
+        "output_path": "data\\output\\modula_orders_20260619_132426.xml",
         "orders_exported": 2
     },
-    "source_file": "data\\demo\\demo_orders.csv",
+    "source_file": "C:/Projects/modula-integration-agent/data/demo/demo_orders.csv",
     "orders_loaded": 2,
     "parser_used": "CsvOrderParser",
     "profile_used": "demo_customer",
+    "profile_path": "configs\\customers\\demo_customer.json",
     "history_record": {
-        "timestamp": "2026-06-10T10:54:50",
+        "timestamp": "2026-06-19T13:24:26",
         "status": "success",
         "orders_processed": 2,
         "ready_for_xml": true,
@@ -32,9 +33,9 @@
         "decision_action": "generate_xml",
         "decision_reason": "Validation passed successfully.",
         "export_status": "success",
-        "output_path": "data\\output\\modula_orders_20260610_105450.xml",
+        "output_path": "data\\output\\modula_orders_20260619_132426.xml",
         "orders_exported": 2,
-        "source_file": "data\\demo\\demo_orders.csv",
+        "source_file": "C:/Projects/modula-integration-agent/data/demo/demo_orders.csv",
         "orders_loaded": 2,
         "parser_used": "CsvOrderParser",
         "profile_used": "demo_customer"

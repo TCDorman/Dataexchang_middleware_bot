@@ -1,0 +1,19 @@
+{
+    "customer_name": "Demo REST Customer",
+    "safe_customer_name": "demo_rest_customer",
+    "customer_profile_path": "configs\\customers\\demo_rest_customer_rest_profile.json",
+    "customer_input_folder": "data/customer_input",
+    "ordini_import_folder": "data/wms_imports/ordini",
+    "articoli_import_folder": "data/wms_imports/articoli",
+    "wms_export_folder": "data/wms_exports",
+    "customer_output_folder": "data/customer_exports",
+    "logs_folder": "generated_integrations\\demo_rest_customer\\logs",
+    "processed_state_path": "generated_integrations\\demo_rest_customer\\processed_files.json",
+    "mode": "local_customer_runner",
+    "wms_runtime": "FolderWMSAdapter",
+    "source_type": "rest_api",
+    "rest_api": {
+        "base_url": "https://jsonplaceholder.typicode.com",
+        "endpoint": "/posts/1"
+    }
+}

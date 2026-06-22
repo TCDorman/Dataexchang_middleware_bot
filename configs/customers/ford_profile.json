@@ -1,6 +1,7 @@
 {
     "customer_name": "Ford",
     "source_type": "csv",
+    "document_type": "ordini",
     "mapping": {
         "order_id": "PO_NUM",
         "customer_name": "BUYER",
@@ -13,6 +14,13 @@
         "PART_NO",
         "QTY_REQ"
     ],
+    "export_settings": {
+        "enabled": true,
+        "only_export_document_type": "ordini",
+        "preserve_source_format": true,
+        "preserve_header_names": true,
+        "preserve_column_order": true
+    },
     "last_successful_run": {
         "timestamp": "2026-06-08T15:18:54.781648",
         "output_path": "data/output/profile_csv_output.xml"

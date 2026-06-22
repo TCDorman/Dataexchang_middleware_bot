@@ -3,6 +3,7 @@ import shutil
 from pathlib import Path
 
 from agents.integration_package_generator import generate_integration_package_from_file
+from agents.openai_profile_review_agent import review_customer_profile
 from src.pipeline.file_processing_pipeline import FileProcessingPipeline
 
 
@@ -42,6 +43,13 @@ def run_full_ai_onboarding(
 
     registered_profile_path = package_result.get("registered_profile_path")
 
+    profile_review_result = review_customer_profile(registered_profile_path)
+
+    profile_review_copy_path = copy_file_if_exists(
+        profile_review_result.get("output_path"),
+        integration_folder / "profile_review.json",
+    )
+
     pipeline = FileProcessingPipeline()
     processing_result = pipeline.process_file(
         file_path=file_path,
@@ -68,6 +76,8 @@ def run_full_ai_onboarding(
         "integration_folder": str(integration_folder),
         "source_copy_path": str(source_copy_path),
         "registered_profile_path": registered_profile_path,
+        "profile_review_copy_path": profile_review_copy_path,
+        "profile_review_result": profile_review_result,
         "original_xml_output_path": xml_output_path,
         "converted_xml_path": copied_xml_path,
         "processing_result_path": str(processing_result_path),

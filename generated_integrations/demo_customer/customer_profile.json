@@ -1,5 +1,5 @@
 {
-    "customer_name": "Demo Customer",
+    "customer_name": "DEMO CUSTOMER",
     "source_type": "csv",
     "target_system": "Modula WMS",
     "target_format": "XML",
@@ -25,23 +25,25 @@
         "quantity": "required_numeric"
     },
     "mapping_confidence": {
-        "order_id": 85,
-        "customer_name": 85,
+        "order_id": 95,
+        "customer_name": 90,
         "ship_to_name": 0,
         "ship_to_address": 0,
-        "item": 85,
-        "quantity": 85,
+        "item": 95,
+        "quantity": 95,
         "location": 0
     },
     "mapping_notes": {
-        "order_id": "Rule-based fallback matched OrderID to order_id.",
-        "customer_name": "Rule-based fallback matched CustomerName to customer_name.",
-        "ship_to_name": "No confident rule-based match found.",
-        "ship_to_address": "No confident rule-based match found.",
-        "item": "Rule-based fallback matched Item to item.",
-        "quantity": "Rule-based fallback matched Quantity to quantity.",
-        "location": "No confident rule-based match found."
+        "order_id": "Mapped to 'OrderID' as it directly corresponds to the order identifier.",
+        "customer_name": "Mapped to 'CustomerName' as it matches the customer name field.",
+        "ship_to_name": "No source column matches 'ship_to_name'; set to null.",
+        "ship_to_address": "No source column matches 'ship_to_address'; set to null.",
+        "item": "Mapped to 'Item' as it directly corresponds to the item field.",
+        "quantity": "Mapped to 'Quantity' as it directly corresponds to the quantity field.",
+        "location": "No source column matches 'location'; set to null."
     },
-    "mapping_method": "fallback_rule_based",
-    "fallback_reason": "OPENAI_API_KEY is not set."
+    "mapping_method": "openai_confirmed",
+    "fallback_reason": null,
+    "confirmed_by_user": true,
+    "confirmed_at": "2026-06-19T13:24:12"
 }

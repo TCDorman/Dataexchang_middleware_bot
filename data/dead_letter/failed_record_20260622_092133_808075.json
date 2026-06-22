@@ -1,0 +1,9 @@
+{
+    "timestamp": "20260622_092133_808075",
+    "source": "rest_push",
+    "reason": "Unit test failure",
+    "record": {
+        "order_id": "TEST-1"
+    },
+    "metadata": {}
+}

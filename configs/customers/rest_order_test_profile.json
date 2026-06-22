@@ -1,0 +1,11 @@
+{
+    "customer_name": "REST Order Test",
+    "source_type": "rest_api",
+    "field_mapping": {
+        "order_id": "orderNumber",
+        "description": "orderDescription",
+        "operation_type": "operationType",
+        "item": "itemCode",
+        "quantity": "quantity"
+    }
+}

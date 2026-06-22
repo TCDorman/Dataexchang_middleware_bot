@@ -1,0 +1,4 @@
+{"timestamp": "2026-06-22T10:50:07", "event_type": "POLL_START", "level": "INFO", "message": "REST pull run started.", "details": {"customer_name": "Ford", "url": "https://jsonplaceholder.typicode.com/posts/1", "dry_run": true}}
+{"timestamp": "2026-06-22T10:50:07", "event_type": "POLL_COMPLETE", "level": "INFO", "message": "Dry-run pull completed.", "details": {"status": "dry_run", "status_code": 200}}
+{"timestamp": "2026-06-22T10:52:05", "event_type": "POLL_START", "level": "INFO", "message": "REST pull run started.", "details": {"customer_name": "Ford", "url": "https://jsonplaceholder.typicode.com/posts/1", "dry_run": false}}
+{"timestamp": "2026-06-22T10:52:06", "event_type": "POLL_COMPLETE", "level": "INFO", "message": "REST pull run completed.", "details": {"status": "success", "status_code": 200, "output_path": "generated_integrations\\ford\\data\\rest_pull_output\\rest_pull_20260622_105206.json"}}

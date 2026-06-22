@@ -1,0 +1,45 @@
+{
+    "status": "confirmed",
+    "confirmed_at": "2026-06-19T13:24:12",
+    "original_mapping_result": {
+        "status": "success",
+        "source_type": "csv",
+        "field_mapping": {
+            "order_id": "OrderID",
+            "customer_name": "CustomerName",
+            "ship_to_name": null,
+            "ship_to_address": null,
+            "item": "Item",
+            "quantity": "Quantity",
+            "location": null
+        },
+        "mapping_confidence": {
+            "order_id": 95,
+            "customer_name": 90,
+            "ship_to_name": 0,
+            "ship_to_address": 0,
+            "item": 95,
+            "quantity": 95,
+            "location": 0
+        },
+        "mapping_notes": {
+            "order_id": "Mapped to 'OrderID' as it directly corresponds to the order identifier.",
+            "customer_name": "Mapped to 'CustomerName' as it matches the customer name field.",
+            "ship_to_name": "No source column matches 'ship_to_name'; set to null.",
+            "ship_to_address": "No source column matches 'ship_to_address'; set to null.",
+            "item": "Mapped to 'Item' as it directly corresponds to the item field.",
+            "quantity": "Mapped to 'Quantity' as it directly corresponds to the quantity field.",
+            "location": "No source column matches 'location'; set to null."
+        },
+        "mapping_method": "openai"
+    },
+    "confirmed_field_mapping": {
+        "order_id": "OrderID",
+        "customer_name": "CustomerName",
+        "ship_to_name": null,
+        "ship_to_address": null,
+        "item": "Item",
+        "quantity": "Quantity",
+        "location": null
+    }
+}

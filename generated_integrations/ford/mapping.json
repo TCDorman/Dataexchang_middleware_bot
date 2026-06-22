@@ -1,9 +1,9 @@
 {
-    "order_id": "",
-    "customer_name": "",
-    "ship_to_name": "",
-    "ship_to_address": "",
-    "item": "",
-    "quantity": "",
-    "location": ""
+    "order_id": "order_id",
+    "customer_name": "customer_name",
+    "ship_to_name": null,
+    "ship_to_address": null,
+    "item": "item",
+    "quantity": "quantity",
+    "location": null
 }

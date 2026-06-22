@@ -1,6 +1,0 @@
-{
-    "order_id": "SHIP_REF",
-    "customer_name": "BUYER_CODE",
-    "item": "SKU_NUMBER",
-    "quantity": "QTY_NEEDED"
-}

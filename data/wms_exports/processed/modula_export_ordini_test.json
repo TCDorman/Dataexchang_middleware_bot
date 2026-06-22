@@ -1,0 +1,29 @@
+{
+    "customer_name": "Ford",
+    "orders": [
+        {
+            "order_id": "WMS-1001",
+            "customer_name": "Ford",
+            "lines": [
+                {
+                    "item": "ABC123",
+                    "quantity": 5
+                },
+                {
+                    "item": "XYZ789",
+                    "quantity": 2
+                }
+            ]
+        },
+        {
+            "order_id": "WMS-1002",
+            "customer_name": "Ford",
+            "lines": [
+                {
+                    "item": "LMN456",
+                    "quantity": 10
+                }
+            ]
+        }
+    ]
+}

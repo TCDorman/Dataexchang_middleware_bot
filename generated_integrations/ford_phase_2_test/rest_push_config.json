@@ -1,0 +1,18 @@
+{
+    "url": "https://jsonplaceholder.typicode.com/posts",
+    "source_path": "C:\\Projects\\modula-integration-agent\\data\\test_rest_push\\orders.csv",
+    "field_mapping": {
+        "order_id": "id",
+        "customer_name": "customer.name",
+        "item": "lines[0].sku",
+        "quantity": "lines[0].qty"
+    },
+    "method": "POST",
+    "headers": {},
+    "api_key": null,
+    "api_key_header": "Authorization",
+    "bearer_token": true,
+    "timeout": 30,
+    "log_path": "generated_integrations\\ford_phase_2_test\\logs\\rest_push_runner.log",
+    "dead_letter_folder": "generated_integrations\\ford_phase_2_test\\data\\dead_letter"
+}

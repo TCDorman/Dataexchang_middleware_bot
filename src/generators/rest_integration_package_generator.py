@@ -6,6 +6,7 @@ Generates a complete REST integration package.
 
 from pathlib import Path
 
+from src.generators.readme_generator import ReadmeGenerator
 from src.generators.rest_config_generator import RestConfigGenerator
 from src.generators.rest_pull_script_generator import RestPullScriptGenerator
 from src.generators.rest_push_script_generator import RestPushScriptGenerator
@@ -14,7 +15,7 @@ from src.generators.scheduler_scaffold_generator import SchedulerScaffoldGenerat
 
 class RestIntegrationPackageGenerator:
     """
-    Generates REST pull, push, scheduler, and config files.
+    Generates REST pull, push, scheduler, config, and README files.
     """
 
     def __init__(self):
@@ -22,6 +23,7 @@ class RestIntegrationPackageGenerator:
         self.push_generator = RestPushScriptGenerator()
         self.config_generator = RestConfigGenerator()
         self.scheduler_generator = SchedulerScaffoldGenerator()
+        self.readme_generator = ReadmeGenerator()
 
     def generate_package(
         self,
@@ -81,6 +83,12 @@ class RestIntegrationPackageGenerator:
             script_name="rest_push_scheduler.py",
         )
 
+        readme_result = self.readme_generator.generate(
+            customer_name=customer_name,
+            output_folder=str(package_folder),
+            source_type="rest_api",
+        )
+
         return {
             "status": "success",
             "customer_name": customer_name,
@@ -92,5 +100,6 @@ class RestIntegrationPackageGenerator:
                 "push_config": push_config_result["config_path"],
                 "pull_scheduler": pull_scheduler_result["script_path"],
                 "push_scheduler": push_scheduler_result["script_path"],
+                "readme": readme_result["readme_path"],
             },
         }

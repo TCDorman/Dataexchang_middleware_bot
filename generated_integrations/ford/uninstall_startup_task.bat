@@ -1,7 +1,7 @@
 @echo off
-set TASK_NAME=Modula_ford_Agent
+set TASK_NAME=Modula_ford_Runtime
 
-echo Removing startup task for Ford...
+echo Removing startup task for Ford runtime...
 echo.
 
 schtasks /Delete /TN "%TASK_NAME%" /F

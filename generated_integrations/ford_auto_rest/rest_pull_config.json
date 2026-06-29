@@ -1,0 +1,11 @@
+{
+    "url": "https://jsonplaceholder.typicode.com/posts/1",
+    "params": {},
+    "headers": {},
+    "api_key": null,
+    "api_key_header": "Authorization",
+    "bearer_token": true,
+    "timeout": 30,
+    "output_folder": "C:\\Projects\\modula-integration-agent\\generated_integrations\\ford_auto_rest\\data\\rest_pull_output",
+    "log_path": "C:\\Projects\\modula-integration-agent\\generated_integrations\\ford_auto_rest\\logs\\rest_pull_runner.log"
+}

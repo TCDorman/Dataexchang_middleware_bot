@@ -286,9 +286,9 @@ def generate_integration_package_from_file(
 
 if __name__ == "__main__":
     result = generate_integration_package_from_file(
-        customer_name="Tesla",
+        customer_name="ESA_Test",
         source_type="csv",
-        file_path="data/customer_input/weird_customer.csv",
+        file_path="data/customer_input/ESA.csv",
     )
 
     print(json.dumps(result, indent=4))

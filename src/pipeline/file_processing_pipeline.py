@@ -1,155 +1,144 @@
-"""
-file_processing_pipeline.py
-
-High-level file processing pipeline for the Modula WMS Data Integration Agent.
-
-Pipeline Flow:
-
-Customer File
-    ↓
-Profile Detection or Explicit Profile Selection
-    ↓
-If No Profile Exists: AI Customer Onboarding
-    ↓
-Profile Loading
-    ↓
-Parser Selection
-    ↓
-Field Mapping
-    ↓
-Internal Order Format
-    ↓
-Workflow Runner
-    ↓
-Validation
-    ↓
-Decision Engine
-    ↓
-XML Export
-    ↓
-Transaction History
-"""
-
+import json
 from pathlib import Path
-from typing import Any, Dict, List
+from datetime import datetime
 
-from src.ai.customer_onboarding_agent import CustomerOnboardingAgent
-from src.parsing.parser_factory import ParserFactory
-from src.profiles.profile_detector import ProfileDetector
-from src.profiles.profile_loader import ProfileLoader
-from src.workflow.workflow_runner import WorkflowRunner
+from agents.openai_field_mapping_agent import infer_field_mapping_with_openai
+from src.ai.header_extraction_agent import HeaderExtractionAgent
+from src.converters.csv_to_canonical import CsvToCanonicalConverter
+from src.formatters.modula_ordini_xml_formatter import ModulaOrdiniXmlFormatter
 
 
 class FileProcessingPipeline:
     """
-    Coordinates file-level processing for customer order data.
+    Full pipeline: customer CSV -> AI mapping -> canonical orders -> Modula XML.
+
+    Usage:
+        pipeline = FileProcessingPipeline(
+            profiles_dir="runtime/profiles",
+            modula_output_dir="runtime/modula_output",
+            processed_dir="runtime/processed",
+            errors_dir="runtime/errors",
+        )
+        pipeline.process(file_path="runtime/customer_input/ESA.csv")
     """
 
-    def __init__(self):
-        self.profile_detector = ProfileDetector()
-        self.profile_loader = ProfileLoader()
-        self.workflow_runner = WorkflowRunner()
-        self.customer_onboarding_agent = CustomerOnboardingAgent()
-
-    def process_transformed_orders(
+    def __init__(
         self,
-        orders: List[Dict[str, Any]],
-    ) -> Dict[str, Any]:
-        """
-        Process already-transformed orders.
-        """
+        profiles_dir: str | Path,
+        modula_output_dir: str | Path,
+        processed_dir: str | Path,
+        errors_dir: str | Path,
+    ):
+        self.profiles_dir = Path(profiles_dir)
+        self.modula_output_dir = Path(modula_output_dir)
+        self.processed_dir = Path(processed_dir)
+        self.errors_dir = Path(errors_dir)
 
-        return self.workflow_runner.run(orders)
+        self.header_agent = HeaderExtractionAgent()
+        self.converter = CsvToCanonicalConverter()
+        self.formatter = ModulaOrdiniXmlFormatter()
 
-    def process_file(
-        self,
-        file_path: str,
-        profile_path: str | None = None,
-    ) -> Dict[str, Any]:
-        """
-        Process a customer input file.
+        for d in [self.profiles_dir, self.modula_output_dir,
+                  self.processed_dir, self.errors_dir]:
+            d.mkdir(parents=True, exist_ok=True)
 
-        If profile_path is provided, the pipeline uses that exact profile.
-        Otherwise, it detects an existing profile or starts AI onboarding.
-        """
+    def _get_profile_path(self, customer_key: str) -> Path:
+        return self.profiles_dir / f"{customer_key}_profile.json"
+
+    def _load_profile(self, customer_key: str) -> dict | None:
+        path = self._get_profile_path(customer_key)
+        if path.exists():
+            with open(path, encoding="utf-8") as f:
+                return json.load(f)
+        return None
+
+    def _save_profile(self, customer_key: str, profile: dict) -> None:
+        path = self._get_profile_path(customer_key)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(profile, f, indent=4)
+
+    def _customer_key(self, file_path: Path) -> str:
+        # Use filename stem as customer key (e.g. "ESA" from "ESA.csv")
+        return file_path.stem.lower().replace(" ", "_")
+
+    def _output_xml_path(self, file_path: Path) -> Path:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        stem = file_path.stem
+        return self.modula_output_dir / f"IMP_ORDINI_{stem}_{timestamp}.xml"
+
+    def process(self, file_path: str | Path) -> dict:
+        file_path = Path(file_path)
+        customer_key = self._customer_key(file_path)
+
+        print(f"[Pipeline] Processing: {file_path.name}")
 
         try:
-            profile_name = None
+            # Step 1: Extract headers
+            headers = self.header_agent.extract_headers(str(file_path))
+            print(f"[Pipeline] Headers found: {headers}")
 
-            if profile_path:
-                profile = self.profile_loader.load_profile_from_path(profile_path)
-                profile_name = self._profile_name_from_path(profile_path)
+            # Step 2: Load saved profile or call AI to map
+            profile = self._load_profile(customer_key)
+
+            if profile:
+                print(f"[Pipeline] Loaded existing profile for '{customer_key}'")
+                field_mapping = profile.get("field_mapping", {})
             else:
-                profile_name = self._get_or_create_profile(file_path)
-                profile = self.profile_loader.load_profile(profile_name)
+                print(f"[Pipeline] No profile found — calling AI to infer mapping...")
+                mapping_result = infer_field_mapping_with_openai(
+                    source_columns=headers,
+                    source_type="csv",
+                )
+                field_mapping = mapping_result.get("field_mapping", {})
+                profile = {
+                    "customer_key": customer_key,
+                    "source_type": "csv",
+                    "header_signature": headers,
+                    "field_mapping": field_mapping,
+                    "mapping_confidence": mapping_result.get("mapping_confidence", {}),
+                    "mapping_notes": mapping_result.get("mapping_notes", {}),
+                    "mapping_method": mapping_result.get("mapping_method"),
+                    "created_at": datetime.now().isoformat(),
+                }
+                self._save_profile(customer_key, profile)
+                print(f"[Pipeline] Profile saved for '{customer_key}'")
 
-            parser = ParserFactory.get_parser(file_path)
+            print(f"[Pipeline] Field mapping: {field_mapping}")
 
-            orders = parser.parse(
-                file_path,
-                profile=profile,
-            )
+            # Step 3: Convert CSV rows to canonical order dicts
+            orders = self.converter.convert(file_path, field_mapping)
+            print(f"[Pipeline] Orders parsed: {len(orders)}")
 
-            return self.workflow_runner.run(
-                orders,
-                metadata={
-                    "source_file": file_path,
-                    "orders_loaded": len(orders),
-                    "parser_used": type(parser).__name__,
-                    "profile_used": profile_name,
-                    "profile_path": profile_path,
-                },
-            )
+            if not orders:
+                raise ValueError("No valid orders found in file after mapping.")
 
-        except Exception as error:
+            # Step 4: Format canonical orders into Modula IMP_ORDINI XML
+            output_path = self._output_xml_path(file_path)
+            result = self.formatter.format_orders_to_xml(orders, output_path)
+            print(f"[Pipeline] XML written: {output_path.name}")
+
+            # Step 5: Move input file to processed
+            dest = self.processed_dir / file_path.name
+            file_path.rename(dest)
+            print(f"[Pipeline] Moved to processed: {dest.name}")
+
             return {
-                "status": "error",
-                "source_file": file_path,
-                "error_message": str(error),
-                "orders_loaded": 0,
-                "decision": {
-                    "action": "stop_processing",
-                    "reason": "Pipeline error occurred.",
-                },
-                "export_result": {
-                    "status": "skipped",
-                    "output_path": None,
-                    "orders_exported": 0,
-                },
+                "status": "success",
+                "customer_key": customer_key,
+                "orders_processed": len(orders),
+                "xml_output": str(output_path),
+                "profile_used": str(self._get_profile_path(customer_key)),
             }
 
-    def _get_or_create_profile(
-        self,
-        file_path: str,
-    ) -> str:
-        """
-        Detect an existing profile or create a new one using AI.
-        """
-
-        try:
-            return self.profile_detector.detect_profile(file_path)
-
-        except ValueError:
-            print("\nNo matching customer profile found.")
-            print("Starting AI-assisted customer onboarding.")
-
-            profile_name = input(
-                "Enter a name for the new customer profile: "
-            ).strip()
-
-            onboarding_result = self.customer_onboarding_agent.onboard_customer(
-                file_path=file_path,
-                profile_name=profile_name,
-            )
-
-            if onboarding_result["status"] != "success":
-                raise ValueError("Customer onboarding was cancelled.")
-
-            return onboarding_result["save_result"]["profile_name"]
-
-    def _profile_name_from_path(self, profile_path: str) -> str:
-        """
-        Extract profile name from a profile file path.
-        """
-
-        return Path(profile_path).stem
+        except Exception as e:
+            # Move to errors folder so the watcher doesn't loop
+            dest = self.errors_dir / file_path.name
+            if file_path.exists():
+                file_path.rename(dest)
+            print(f"[Pipeline] ERROR: {e} — moved to errors/")
+            return {
+                "status": "error",
+                "file": str(file_path),
+                "error": str(e),
+            }

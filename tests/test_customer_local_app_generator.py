@@ -1,12 +1,19 @@
 """
 test_customer_local_app_generator.py
-
-Simple test for generating a customer-specific local agent.
 """
 
-from agents.customer_local_app_generator import generate_customer_local_app
 import json
+import sys
+from pathlib import Path
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from agents.customer_local_app_generator import (
+    generate_customer_local_app,
+)
 
 def main():
     result = generate_customer_local_app(

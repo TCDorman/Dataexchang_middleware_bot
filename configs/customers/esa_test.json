@@ -1,0 +1,49 @@
+{
+    "customer_name": "ESA_Test",
+    "source_type": "csv",
+    "target_system": "Modula WMS",
+    "target_format": "XML",
+    "header_signature": [
+        "Purchase Order",
+        "Company",
+        "Part Number",
+        "Requested Qty"
+    ],
+    "field_mapping": {
+        "order_id": "Purchase Order",
+        "customer_name": "Company",
+        "ship_to_name": null,
+        "ship_to_address": null,
+        "item": "Part Number",
+        "quantity": "Requested Qty",
+        "location": null
+    },
+    "validation_rules": {
+        "order_id": "required",
+        "customer_name": "optional",
+        "item": "required",
+        "quantity": "required_numeric"
+    },
+    "mapping_confidence": {
+        "order_id": 95,
+        "customer_name": 90,
+        "ship_to_name": 0,
+        "ship_to_address": 0,
+        "item": 95,
+        "quantity": 95,
+        "location": 0
+    },
+    "mapping_notes": {
+        "order_id": "Mapped to 'Purchase Order' as it clearly represents the order identifier.",
+        "customer_name": "Mapped to 'Company' as it likely represents the customer name.",
+        "ship_to_name": "No source column matches ship to name; set to null.",
+        "ship_to_address": "No source column matches ship to address; set to null.",
+        "item": "Mapped to 'Part Number' as it corresponds to the item identifier.",
+        "quantity": "Mapped to 'Requested Qty' as it represents the quantity requested.",
+        "location": "No source column matches location; set to null."
+    },
+    "mapping_method": "openai",
+    "fallback_reason": null,
+    "confirmed_by_user": false,
+    "confirmed_at": null
+}

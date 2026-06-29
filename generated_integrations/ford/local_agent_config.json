@@ -18,6 +18,15 @@
     "mode": "local_customer_runner",
     "wms_runtime": "FolderWMSAdapter",
     "source_type": "file",
+    "runtime": {
+        "runtime_folder": "generated_integrations\\ford\\runtime",
+        "customer_input_folder": "generated_integrations\\ford\\runtime\\customer_input",
+        "modula_output_folder": "generated_integrations\\ford\\runtime\\modula_output",
+        "processed_folder": "generated_integrations\\ford\\runtime\\processed",
+        "errors_folder": "generated_integrations\\ford\\runtime\\errors",
+        "profiles_folder": "generated_integrations\\ford\\runtime\\profiles",
+        "output_format": "modula_wms_xml"
+    },
     "rest_api": {
         "base_url": null,
         "endpoint": null,

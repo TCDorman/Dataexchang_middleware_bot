@@ -1,0 +1,9 @@
+Purchase Order,Company,Part Number,Requested Qty
+PO10001,Brawl Industries,BRG-100,10
+PO10001,Brawl Industries,CBL-100,5
+PO10001,Brawl Industries,CBL-200,3
+PO10002,Brawl Industries,CBL-100,12
+PO10002,Brawl Industries,BRG-100,8
+PO10003,Brawl Industries,CBL-200,15
+PO10003,Brawl Industries,BRG-100,4
+PO10003,Brawl Industries,CBL-100,9

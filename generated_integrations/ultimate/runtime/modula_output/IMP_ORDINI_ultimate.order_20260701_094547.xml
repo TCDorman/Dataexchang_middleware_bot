@@ -1,0 +1,130 @@
+<?xml version='1.0' encoding='utf-8'?>
+<SYSTORE>
+    <IMP_ORDINI>
+        <ORD_ORDINE>PO10001</ORD_ORDINE>
+        <ORD_DES>Brawl Industries</ORD_DES>
+        <ORD_TIPOOP>P</ORD_TIPOOP>
+        <IMP_ORDINI_RIGHE>
+            <RIG_ORDINE>PO10001</RIG_ORDINE>
+            <RIG_ARTICOLO>BRG-100</RIG_ARTICOLO>
+            <RIG_SUB1 />
+            <RIG_SUB2 />
+            <RIG_STAMATE />
+            <RIG_TIPOCONF />
+            <RIG_HOSTINF />
+            <RIG_QTAR>10</RIG_QTAR>
+            <RIG_REQ_NOTE />
+            <RIG_NOTE_STAMPA />
+            <RIG_HOSTCAUS />
+            <RIG_HOSTRIF />
+        </IMP_ORDINI_RIGHE>
+        <IMP_ORDINI_RIGHE>
+            <RIG_ORDINE>PO10001</RIG_ORDINE>
+            <RIG_ARTICOLO>CBL-100</RIG_ARTICOLO>
+            <RIG_SUB1 />
+            <RIG_SUB2 />
+            <RIG_STAMATE />
+            <RIG_TIPOCONF />
+            <RIG_HOSTINF />
+            <RIG_QTAR>5</RIG_QTAR>
+            <RIG_REQ_NOTE />
+            <RIG_NOTE_STAMPA />
+            <RIG_HOSTCAUS />
+            <RIG_HOSTRIF />
+        </IMP_ORDINI_RIGHE>
+        <IMP_ORDINI_RIGHE>
+            <RIG_ORDINE>PO10001</RIG_ORDINE>
+            <RIG_ARTICOLO>CBL-200</RIG_ARTICOLO>
+            <RIG_SUB1 />
+            <RIG_SUB2 />
+            <RIG_STAMATE />
+            <RIG_TIPOCONF />
+            <RIG_HOSTINF />
+            <RIG_QTAR>3</RIG_QTAR>
+            <RIG_REQ_NOTE />
+            <RIG_NOTE_STAMPA />
+            <RIG_HOSTCAUS />
+            <RIG_HOSTRIF />
+        </IMP_ORDINI_RIGHE>
+    </IMP_ORDINI>
+    <IMP_ORDINI>
+        <ORD_ORDINE>PO10002</ORD_ORDINE>
+        <ORD_DES>Brawl Industries</ORD_DES>
+        <ORD_TIPOOP>P</ORD_TIPOOP>
+        <IMP_ORDINI_RIGHE>
+            <RIG_ORDINE>PO10002</RIG_ORDINE>
+            <RIG_ARTICOLO>CBL-100</RIG_ARTICOLO>
+            <RIG_SUB1 />
+            <RIG_SUB2 />
+            <RIG_STAMATE />
+            <RIG_TIPOCONF />
+            <RIG_HOSTINF />
+            <RIG_QTAR>12</RIG_QTAR>
+            <RIG_REQ_NOTE />
+            <RIG_NOTE_STAMPA />
+            <RIG_HOSTCAUS />
+            <RIG_HOSTRIF />
+        </IMP_ORDINI_RIGHE>
+        <IMP_ORDINI_RIGHE>
+            <RIG_ORDINE>PO10002</RIG_ORDINE>
+            <RIG_ARTICOLO>BRG-100</RIG_ARTICOLO>
+            <RIG_SUB1 />
+            <RIG_SUB2 />
+            <RIG_STAMATE />
+            <RIG_TIPOCONF />
+            <RIG_HOSTINF />
+            <RIG_QTAR>8</RIG_QTAR>
+            <RIG_REQ_NOTE />
+            <RIG_NOTE_STAMPA />
+            <RIG_HOSTCAUS />
+            <RIG_HOSTRIF />
+        </IMP_ORDINI_RIGHE>
+    </IMP_ORDINI>
+    <IMP_ORDINI>
+        <ORD_ORDINE>PO10003</ORD_ORDINE>
+        <ORD_DES>Brawl Industries</ORD_DES>
+        <ORD_TIPOOP>P</ORD_TIPOOP>
+        <IMP_ORDINI_RIGHE>
+            <RIG_ORDINE>PO10003</RIG_ORDINE>
+            <RIG_ARTICOLO>CBL-200</RIG_ARTICOLO>
+            <RIG_SUB1 />
+            <RIG_SUB2 />
+            <RIG_STAMATE />
+            <RIG_TIPOCONF />
+            <RIG_HOSTINF />
+            <RIG_QTAR>15</RIG_QTAR>
+            <RIG_REQ_NOTE />
+            <RIG_NOTE_STAMPA />
+            <RIG_HOSTCAUS />
+            <RIG_HOSTRIF />
+        </IMP_ORDINI_RIGHE>
+        <IMP_ORDINI_RIGHE>
+            <RIG_ORDINE>PO10003</RIG_ORDINE>
+            <RIG_ARTICOLO>BRG-100</RIG_ARTICOLO>
+            <RIG_SUB1 />
+            <RIG_SUB2 />
+            <RIG_STAMATE />
+            <RIG_TIPOCONF />
+            <RIG_HOSTINF />
+            <RIG_QTAR>4</RIG_QTAR>
+            <RIG_REQ_NOTE />
+            <RIG_NOTE_STAMPA />
+            <RIG_HOSTCAUS />
+            <RIG_HOSTRIF />
+        </IMP_ORDINI_RIGHE>
+        <IMP_ORDINI_RIGHE>
+            <RIG_ORDINE>PO10003</RIG_ORDINE>
+            <RIG_ARTICOLO>CBL-100</RIG_ARTICOLO>
+            <RIG_SUB1 />
+            <RIG_SUB2 />
+            <RIG_STAMATE />
+            <RIG_TIPOCONF />
+            <RIG_HOSTINF />
+            <RIG_QTAR>9</RIG_QTAR>
+            <RIG_REQ_NOTE />
+            <RIG_NOTE_STAMPA />
+            <RIG_HOSTCAUS />
+            <RIG_HOSTRIF />
+        </IMP_ORDINI_RIGHE>
+    </IMP_ORDINI>
+</SYSTORE>

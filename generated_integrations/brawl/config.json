@@ -1,0 +1,29 @@
+{
+    "customer_name": "Brawl",
+    "source_type": "csv",
+    "supported_source_types": [
+        "csv",
+        "json",
+        "xml"
+    ],
+    "supported_file_extensions": [
+        ".csv",
+        ".json",
+        ".xml"
+    ],
+    "target_system": "Modula WMS",
+    "target_format": "XML",
+    "created_at": "2026-06-30T15:05:15.572394",
+    "runtime": {
+        "input_dir": "runtime/customer_input",
+        "output_dir": "runtime/customer_output",
+        "modula_output_dir": "runtime/modula_output",
+        "processed_dir": "runtime/processed",
+        "errors_dir": "runtime/errors",
+        "profiles_dir": "runtime/profiles",
+        "poll_interval_seconds": 5
+    },
+    "wms": {
+        "ordini_import_path": "runtime/wms_order_import_test"
+    }
+}

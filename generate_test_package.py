@@ -898,10 +898,18 @@ def write_customer_export_xml(
 
 
 def write_customer_export(export_orders: list[dict], source_file: Path) -> Path:
-    # Convert parsed EXP_ORDINI data back into the customer's configured format.
-    output_format = CUSTOMER_OUTPUT_FORMAT
+    # Convert parsed EXP_ORDINI data back into the customer's original format.
+    #
+    # The profile is created during import and records the source_type that was
+    # actually received from the customer. This prevents XML imports from being
+    # exported as CSV just because config.json has customer_output.format = csv.
     profile = load_customer_profile()
     field_mapping = get_profile_field_mapping(profile)
+
+    output_format = (
+        profile.get("source_type")
+        or CUSTOMER_OUTPUT_FORMAT
+    ).lower()
 
     if field_mapping:
         log.info(f"Using profile-driven export mapping: {{field_mapping}}")

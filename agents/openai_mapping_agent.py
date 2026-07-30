@@ -1,164 +1,71 @@
-"""
-==================================================
-OpenAI Mapping Agent
-==================================================
-
-Purpose:
-    Uses OpenAI to infer field mappings between
-    customer data and the Modula WMS schema.
-
-Responsibilities:
-    - Analyze unknown customer fields
-    - Suggest Modula-compatible mappings
-    - Return mappings as structured JSON
-
-Example:
-
-Input:
-{
-    "OrderNumber": "1001",
-    "Customer": "Ford",
-    "PartNumber": "ABC123",
-    "Qty": 5
-}
-
-Output:
-{
-    "order_id": "OrderNumber",
-    "customer_name": "Customer",
-    "item": "PartNumber",
-    "quantity": "Qty"
-}
-"""
-
-# ==================================================
-# Imports
-# ==================================================
-
 import json
+import os
 
-from src.ai.openai_client import OpenAIClient
+from openai import OpenAI
+
 
 # ==================================================
-# Response Cleaning
+# OpenAI Client
 # ==================================================
-
-def clean_json_response(response_text: str) -> str:
+def get_openai_client():
     """
-    Remove markdown code fences from an AI response.
-
-    Args:
-        response_text:
-            Raw response returned by OpenAI.
-
-    Returns:
-        Clean JSON string.
+    Create an OpenAI client using OPENAI_API_KEY from
+    the environment.
     """
+    if not os.getenv("OPENAI_API_KEY"):
+        raise ValueError(
+            "OPENAI_API_KEY environment variable is not set."
+        )
 
-    cleaned = response_text.strip()
-
-    if cleaned.startswith("```json"):
-        cleaned = cleaned.replace("```json", "", 1)
-
-    if cleaned.startswith("```"):
-        cleaned = cleaned.replace("```", "", 1)
-
-    if cleaned.endswith("```"):
-        cleaned = cleaned[:-3]
-
-    return cleaned.strip()
-
-# ==================================================
-# OpenAI Mapping Agent
-# ==================================================
-
-class OpenAIMappingAgent:
-    """
-    AI-powered field mapping generator.
-    """
-
-    def __init__(self):
-        """
-        Initialize OpenAI client.
-        """
-
-        self.client = OpenAIClient()
-
-    def infer_mapping(
-        self,
-        sample_record: dict,
-    ) -> dict:
-        """
-        Infer Modula field mappings from
-        a customer sample record.
-
-        Args:
-            sample_record:
-                Sample customer record.
-
-        Returns:
-            Dictionary containing mapping suggestions.
-        """
-
-        prompt = f"""
-You are a warehouse integration expert.
-
-A customer has provided the following order data:
-
-{json.dumps(sample_record, indent=4)}
-
-Determine which fields correspond to the following
-Modula WMS fields:
-
-- order_id
-- customer_name
-- item
-- quantity
-
-Return ONLY valid JSON.
-
-Example:
-
-{{
-    "order_id": "OrderNumber",
-    "customer_name": "Customer",
-    "item": "PartNumber",
-    "quantity": "Qty"
-}}
-"""
-
-        response = self.client.ask(prompt)
-
-        cleaned_response = clean_json_response(response)
-
-        try:
-            return json.loads(cleaned_response)
-
-        except Exception:
-            return {
-                "error": "Failed to parse AI response.",
-                "raw_response": response,
-            }
+    return OpenAI()
 
 
 # ==================================================
-# Convenience Function
+# Infer Mapping With OpenAI
 # ==================================================
-
 def infer_mapping_with_openai(
-    sample_record: dict,
-) -> dict:
+    columns: list,
+    sample_rows: list,
+):
     """
-    Simple helper function for direct usage.
+    Ask OpenAI to map customer fields to Modula canonical fields.
 
-    Args:
-        sample_record:
-            Sample customer record.
-
-    Returns:
-        AI-generated mapping.
+    Expected output:
+    {
+        "order_id": "PO_NUM",
+        "customer_name": "BUYER",
+        "item": "PART_NO",
+        "quantity": "QTY_REQ",
+        "operation_type": null
+    }
     """
+    client = get_openai_client()
 
-    agent = OpenAIMappingAgent()
+    prompt = {
+        "task": "Map customer ERP fields to Modula WMS canonical fields.",
+        "canonical_fields": [
+            "order_id",
+            "customer_name",
+            "item",
+            "quantity",
+            "operation_type",
+        ],
+        "columns": columns,
+        "sample_rows": sample_rows,
+        "rules": [
+            "Return only valid JSON.",
+            "Use null when no matching source column exists.",
+            "Do not invent source columns.",
+        ],
+    }
 
-    return agent.infer_mapping(sample_record)
+    response = client.responses.create(
+        model="gpt-5.5-mini",
+        input=(
+            "You are a data integration mapping assistant. "
+            "Return only a JSON object.\n\n"
+            + json.dumps(prompt, indent=2)
+        ),
+    )
+
+    return json.loads(response.output_text)

@@ -268,7 +268,7 @@ def create_config(
             "api_key": "",
             "api_key_header": "Authorization",
             "bearer_token": True,
-            "records_key": "orders",
+            "records_key": "",
             "batch_key": "orders",
             "field_mapping": {},
             "poll_interval_seconds": 60,
@@ -389,6 +389,7 @@ ERRORS_DIR = resolve_package_path(
 PROFILES_DIR = resolve_package_path(
     RUNTIME_CONFIG.get("profiles_dir", "runtime/profiles")
 )
+REST_IMPORT_MAPPING_PATH = PROFILES_DIR / "rest_api_import_mapping.json"
 WMS_EXPORT_PROCESSED_DIR = resolve_package_path(
     RUNTIME_CONFIG.get("wms_export_processed_dir", "runtime/wms_export_processed")
 )
@@ -430,10 +431,13 @@ except ImportError as error:
     sys.exit(1)
 
 try:
-    from src.connectors.rest_api_connector import RestApiConnector
+    from src.connectors.rest_api_connector import RestApiConnector, clean_json_response
+    from src.ai.openai_client import OpenAIClient
 except ImportError as error:
     # Keep REST optional. File-based middleware still works when REST is disabled.
     RestApiConnector = None
+    OpenAIClient = None
+    clean_json_response = None
     log.warning(f"REST API connector unavailable: {{error}}")
 
 try:
@@ -971,16 +975,193 @@ def extract_records_from_api_data(api_data: object, records_key: str | None) -> 
     return [record for record in records if isinstance(record, dict)]
 
 
-def rest_field_mapping() -> dict:
-    # REST imports can use an explicit mapping in config.json. If none is set,
-    # fall back to the saved customer profile from the file onboarding flow.
+def get_rest_source_fields(records: list[dict]) -> list[str]:
+    # Collect every available source field from representative REST records.
+    # Exact field spelling is preserved so OpenAI can return a usable mapping.
+    fields = set()
+
+    for record in records[:20]:
+        if not isinstance(record, dict):
+            continue
+
+        for key in record.keys():
+            fields.add(str(key))
+
+    return sorted(fields)
+
+
+def validate_rest_mapping(mapping: dict, records: list[dict]) -> dict:
+    # Require the four canonical fields and verify that OpenAI selected fields
+    # that actually exist in the REST response.
+    required_fields = ["order_id", "customer_name", "item", "quantity"]
+
+    if not isinstance(mapping, dict):
+        raise ValueError("REST field mapping must be a JSON object.")
+
+    cleaned_mapping = {{
+        field: str(mapping.get(field, "")).strip()
+        for field in required_fields
+    }}
+
+    missing = [
+        field
+        for field, source_field in cleaned_mapping.items()
+        if not source_field
+    ]
+
+    if missing:
+        raise ValueError(
+            "REST field mapping is missing required canonical fields: "
+            + ", ".join(missing)
+        )
+
+    source_fields = set(get_rest_source_fields(records))
+    invalid = [
+        source_field
+        for source_field in cleaned_mapping.values()
+        if source_field.split(".")[0] not in source_fields
+    ]
+
+    if invalid:
+        raise ValueError(
+            "REST field mapping contains fields not found in the API response: "
+            + ", ".join(invalid)
+        )
+
+    return cleaned_mapping
+
+
+def load_saved_rest_mapping() -> dict:
+    # REST import mappings are kept separate from customer export profiles.
+    if not REST_IMPORT_MAPPING_PATH.exists():
+        return {{}}
+
+    try:
+        with open(REST_IMPORT_MAPPING_PATH, "r", encoding="utf-8") as file:
+            payload = json.load(file)
+
+        mapping = payload.get("field_mapping", payload)
+
+        if isinstance(mapping, dict):
+            return mapping
+
+    except Exception as error:
+        log.warning(f"Could not load saved REST import mapping: {{error}}")
+
+    return {{}}
+
+
+def save_rest_mapping(mapping: dict, records: list[dict]) -> Path:
+    REST_IMPORT_MAPPING_PATH.parent.mkdir(parents=True, exist_ok=True)
+
+    payload = {{
+        "source_type": "rest_api",
+        "customer_name": CONFIG.get("customer_name", ""),
+        "field_mapping": mapping,
+        "source_fields": get_rest_source_fields(records),
+        "created_at": datetime.now().isoformat(),
+    }}
+
+    with open(REST_IMPORT_MAPPING_PATH, "w", encoding="utf-8") as file:
+        json.dump(payload, file, indent=4)
+
+    return REST_IMPORT_MAPPING_PATH
+
+
+def infer_rest_mapping_with_openai(records: list[dict]) -> dict:
+    # Ask OpenAI to understand unfamiliar REST response fields instead of
+    # requiring the customer to manually configure a parser mapping.
+    if OpenAIClient is None or clean_json_response is None:
+        raise ImportError(
+            "OpenAI REST mapping is unavailable because the AI client "
+            "or response cleaner could not be imported."
+        )
+
+    if not records:
+        raise ValueError("Cannot infer REST mapping from an empty API response.")
+
+    source_fields = get_rest_source_fields(records)
+    sample_records = records[:10]
+
+    prompt = f'''\nYou are a warehouse and Modula WMS data-integration specialist.
+
+Analyze the REST API source fields and sample records below. Identify the exact
+source field that maps to each canonical order field:
+
+- order_id: purchase order number, order number, PO number, transaction number
+- customer_name: customer, company, buyer, client, account, organization
+- item: part number, SKU, article, product code, material number
+- quantity: requested quantity, ordered quantity, required quantity, units
+
+Return ONLY valid JSON in exactly this shape:
+
+{{{{
+    "order_id": "exact source field",
+    "customer_name": "exact source field",
+    "item": "exact source field",
+    "quantity": "exact source field"
+}}}}
+
+Rules:
+- Preserve the exact source field spelling and capitalization.
+- Do not invent fields.
+- Use dotted paths only when the value is nested.
+- Do not include markdown or explanation.
+
+Available source fields:
+{{json.dumps(source_fields, indent=2)}}
+
+Sample REST records:\n{{json.dumps(sample_records, indent=2, default=str)}}\n'''\n\n    response_text = OpenAIClient().ask(prompt)
+    cleaned_response = clean_json_response(response_text)
+
+    try:
+        mapping = json.loads(cleaned_response)
+    except json.JSONDecodeError as error:
+        raise ValueError(
+            "OpenAI returned invalid JSON while mapping REST fields. "
+            f"Response preview: {{response_text[:500]}}"
+        ) from error
+
+    return validate_rest_mapping(mapping, records)
+
+
+def rest_field_mapping(records: list[dict]) -> dict:
+    # Mapping priority:
+    # 1. Explicit config.json override
+    # 2. Saved REST-specific AI mapping
+    # 3. OpenAI analysis of the live REST response
     configured_mapping = REST_API_CONFIG.get("field_mapping", {{}})
 
     if isinstance(configured_mapping, dict) and configured_mapping:
-        return configured_mapping
+        mapping = validate_rest_mapping(configured_mapping, records)
+        log.info(f"Using configured REST field mapping: {{mapping}}")
+        return mapping
 
-    profile = load_customer_profile()
-    return get_profile_field_mapping(profile)
+    saved_mapping = load_saved_rest_mapping()
+
+    if saved_mapping:
+        try:
+            mapping = validate_rest_mapping(saved_mapping, records)
+            log.info(
+                f"Loaded saved REST AI mapping: "
+                f"{{REST_IMPORT_MAPPING_PATH.name}} -> {{mapping}}"
+            )
+            return mapping
+        except Exception as error:
+            log.warning(
+                "Saved REST mapping no longer matches the API response; "
+                f"requesting a new AI mapping. Reason: {{error}}"
+            )
+
+    log.info(
+        "No usable REST mapping found. Asking OpenAI to analyze "
+        "the live API response."
+    )
+    mapping = infer_rest_mapping_with_openai(records)
+    mapping_path = save_rest_mapping(mapping, records)
+    log.info(f"OpenAI REST mapping identified: {{mapping}}")
+    log.info(f"Saved REST import mapping: {{mapping_path}}")
+    return mapping
 
 
 def normalize_rest_records_to_orders(records: list[dict], field_mapping: dict) -> list[dict]:
@@ -1077,7 +1258,10 @@ def write_rest_import_temp_file(api_data: object) -> tuple[Path, set[str]]:
     # processed/, and copy the XML to the Modula IMPEXP folder.
     records_key = REST_API_CONFIG.get("records_key", "orders")
     records = extract_records_from_api_data(api_data, records_key)
-    mapping = rest_field_mapping()
+    if not records:
+        raise ValueError("REST API response contained no record objects.")
+
+    mapping = rest_field_mapping(records)
     normalized_rows = normalize_rest_records_to_orders(records, mapping)
 
     if not normalized_rows:

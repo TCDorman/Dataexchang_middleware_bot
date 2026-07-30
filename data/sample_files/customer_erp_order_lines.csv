@@ -1,5 +1,0 @@
-sales_order_id,product_sku,product_description,ordered_qty
-SO-9001,ITEM-A100,Motor Assembly,4
-SO-9001,ITEM-B200,Control Panel,2
-SO-9002,ITEM-C300,Sensor Kit,6
-SO-9002,ITEM-D400,Cable Harness,3

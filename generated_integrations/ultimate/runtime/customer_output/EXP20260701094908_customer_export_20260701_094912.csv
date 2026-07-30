@@ -1,4 +1,0 @@
-﻿Purchase Order,Company,Part Number,Requested Qty,operation_type,warehouse_number,bay_number,sub1,warehouse_task,source_bin,destination_bin
-PO10001,,BRG-100,10.000,P,,,,,,
-PO10001,,CBL-100,5.000,P,,,,,,
-PO10001,,CBL-200,3.000,P,,,,,,

@@ -1,6 +1,0 @@
-{
-    "connection_string": "C:\\Projects\\modula-integration-agent\\data\\test_sql\\auto_sql_test.db",
-    "database_type": "sqlite",
-    "query": "SELECT order_id, customer_name, item, quantity FROM source_orders",
-    "output_path": "C:\\Projects\\modula-integration-agent\\generated_integrations\\ford_auto_sql\\data\\sql_pull_output.json"
-}

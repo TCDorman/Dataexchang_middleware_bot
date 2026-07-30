@@ -1,7 +1,0 @@
-{
-    "status": "error",
-    "source_type": "sql",
-    "message": "SQL / ODBC schema discovery failed.",
-    "error": "('08001', '[08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]SQL Server does not exist or access denied. (17) (SQLDriverConnect); [08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]ConnectionOpen (Connect()). (2)')",
-    "connection_preview": "Driver={SQL Server};Server=localhost;Database=CustomerERP;Uid=****;PWD=****;"
-}

@@ -1,3 +1,0 @@
-sales_order_id,customer_name,order_type,requested_ship_date
-SO-9001,Acme Manufacturing,Pick,2026-06-01
-SO-9002,Northwind Parts,Pick,2026-06-02

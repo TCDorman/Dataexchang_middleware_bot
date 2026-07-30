@@ -1,5 +1,0 @@
-client_order_ref,material_code,material_description,requested_quantity,staging_lane
-ALPHA-7001,MTR-100,Drive Motor,5,LANE-1
-ALPHA-7001,BRG-200,Sealed Bearing,12,LANE-1
-ALPHA-7002,SNS-300,Optical Sensor,8,LANE-2
-ALPHA-7002,CBL-400,Control Cable,20,LANE-2

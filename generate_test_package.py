@@ -45,8 +45,8 @@ TARGET_FORMAT = "XML"
 DEFAULT_WMS_ORDER_IMPORT_PATH = r"C:\SystemLogistics\IMPEXP"
 SUPPORTED_SOURCE_TYPES = ["csv", "json", "xml"]
 SUPPORTED_FILE_EXTENSIONS = [".csv", ".json", ".xml"]
-GENERATOR_VERSION = "1.5.0"
-PACKAGE_SCHEMA_VERSION = "1.5.0"
+GENERATOR_VERSION = "1.5.1"
+PACKAGE_SCHEMA_VERSION = "1.5.1"
 
 
 def parse_args() -> argparse.Namespace:
@@ -1880,17 +1880,165 @@ if __name__ == "__main__":
 
 def create_setup_rest_api_script(base: Path) -> None:
     """
-    Creates a customer-friendly REST API setup utility.
+    Creates the customer-facing REST API setup utility.
 
-    This lets a customer configure REST import/export links without manually
-    editing config.json. It only updates the rest_api section and leaves the
-    existing file, WMS, runtime, and profile settings unchanged.
+    The setup intentionally asks for only the two values the customer needs to
+    provide: the import endpoint and the export endpoint. All other REST runtime
+    settings remain hidden and use the existing values/defaults in config.json.
     """
 
-    content = '"""\nsetup_rest_api.py\n\nCustomer-friendly REST API setup utility.\n\nRun from the generated package folder:\n    python setup_rest_api.py\n\nOr double-click:\n    setup_api.bat\n\nThis script updates only the "rest_api" section of config.json.\n"""\n\nimport json\nimport urllib.error\nimport urllib.parse\nimport urllib.request\nfrom pathlib import Path\n\n\nPACKAGE_DIR = Path(__file__).resolve().parent\nCONFIG_PATH = PACKAGE_DIR / "config.json"\n\n\ndef load_config() -> dict:\n    if not CONFIG_PATH.exists():\n        raise FileNotFoundError(f"Missing config.json: {CONFIG_PATH}")\n\n    with open(CONFIG_PATH, "r", encoding="utf-8") as file:\n        return json.load(file)\n\n\ndef save_config(config: dict) -> None:\n    with open(CONFIG_PATH, "w", encoding="utf-8") as file:\n        json.dump(config, file, indent=4)\n\n\ndef ask_yes_no(prompt: str, default: bool = False) -> bool:\n    default_label = "Y/n" if default else "y/N"\n\n    while True:\n        value = input(f"{prompt} [{default_label}]: ").strip().lower()\n\n        if not value:\n            return default\n\n        if value in ["y", "yes"]:\n            return True\n\n        if value in ["n", "no"]:\n            return False\n\n        print("Please enter y or n.")\n\n\ndef ask_text(prompt: str, default: str = "") -> str:\n    if default:\n        value = input(f"{prompt} [{default}]: ").strip()\n        return value or default\n\n    return input(f"{prompt}: ").strip()\n\n\ndef ask_int(prompt: str, default: int) -> int:\n    while True:\n        value = input(f"{prompt} [{default}]: ").strip()\n\n        if not value:\n            return default\n\n        try:\n            return int(value)\n        except ValueError:\n            print("Please enter a whole number.")\n\n\ndef ask_json_object(prompt: str, default: dict | None = None) -> dict:\n    default = default or {}\n\n    print(prompt)\n    print("Leave blank for {}.")\n\n    while True:\n        value = input("> ").strip()\n\n        if not value:\n            return default\n\n        try:\n            parsed = json.loads(value)\n        except json.JSONDecodeError as error:\n            print(f"Invalid JSON: {error}")\n            continue\n\n        if not isinstance(parsed, dict):\n            print("Please enter a JSON object, for example: {\\"X-Header\\": \\"value\\"}")\n            continue\n\n        return parsed\n\n\ndef build_headers(rest_config: dict) -> dict:\n    headers = dict(rest_config.get("headers", {}) or {})\n    api_key = rest_config.get("api_key", "")\n    api_key_header = rest_config.get("api_key_header", "Authorization")\n    bearer_token = bool(rest_config.get("bearer_token", True))\n\n    if api_key:\n        headers[api_key_header] = f"Bearer {api_key}" if bearer_token else api_key\n\n    return headers\n\n\ndef test_get(url: str, rest_config: dict) -> None:\n    if not url:\n        print("Import URL is blank; skipping GET test.")\n        return\n\n    params = rest_config.get("params", {}) or {}\n    query = urllib.parse.urlencode(params)\n    test_url = f"{url}?{query}" if query else url\n\n    request = urllib.request.Request(\n        test_url,\n        method="GET",\n        headers=build_headers(rest_config),\n    )\n\n    timeout = int(rest_config.get("timeout_seconds", 30))\n\n    try:\n        with urllib.request.urlopen(request, timeout=timeout) as response:\n            body = response.read(500).decode("utf-8", errors="replace")\n            print(f"GET test succeeded. HTTP {response.status}")\n            print(f"Response preview: {body}")\n    except urllib.error.HTTPError as error:\n        print(f"GET test failed. HTTP {error.code}: {error.reason}")\n    except Exception as error:\n        print(f"GET test failed: {error}")\n\n\ndef test_export_post(url: str, rest_config: dict) -> None:\n    if not url:\n        print("Export URL is blank; skipping POST/PUT test.")\n        return\n\n    payload = {\n        "source_system": "Modula WMS",\n        "document_type": "REST_SETUP_TEST",\n        "orders": [\n            {\n                "order_id": "SETUP-TEST",\n                "lines": [\n                    {\n                        "item": "BRG-100",\n                        "quantity": "1",\n                    }\n                ],\n            }\n        ],\n    }\n\n    data = json.dumps(payload).encode("utf-8")\n    headers = build_headers(rest_config)\n    headers["Content-Type"] = "application/json"\n\n    request = urllib.request.Request(\n        url,\n        data=data,\n        method=rest_config.get("export_method", "POST").upper(),\n        headers=headers,\n    )\n\n    timeout = int(rest_config.get("timeout_seconds", 30))\n\n    try:\n        with urllib.request.urlopen(request, timeout=timeout) as response:\n            body = response.read(500).decode("utf-8", errors="replace")\n            print(f"Export test succeeded. HTTP {response.status}")\n            print(f"Response preview: {body}")\n    except urllib.error.HTTPError as error:\n        print(f"Export test failed. HTTP {error.code}: {error.reason}")\n    except Exception as error:\n        print(f"Export test failed: {error}")\n\n\ndef configure_rest_api(config: dict) -> dict:\n    rest_config = dict(config.get("rest_api", {}) or {})\n\n    print("=" * 70)\n    print("REST API SETUP")\n    print("=" * 70)\n    print("This setup updates only config.json -> rest_api.")\n    print("Leave optional values blank if the customer API does not need them.")\n    print("=" * 70)\n\n    import_enabled = ask_yes_no(\n        "Enable REST API import? Customer API -> Modula",\n        bool(rest_config.get("import_enabled", False)),\n    )\n\n    export_enabled = ask_yes_no(\n        "Enable REST API export? Modula -> Customer API",\n        bool(rest_config.get("export_enabled", False)),\n    )\n\n    rest_config["enabled"] = import_enabled or export_enabled\n    rest_config["import_enabled"] = import_enabled\n    rest_config["export_enabled"] = export_enabled\n\n    if import_enabled:\n        rest_config["import_url"] = ask_text(\n            "Import GET URL",\n            rest_config.get("import_url", ""),\n        )\n        rest_config["records_key"] = ask_text(\n            "Records key/path in API response",\n            rest_config.get("records_key", "orders"),\n        )\n\n    if export_enabled:\n        rest_config["export_url"] = ask_text(\n            "Export POST/PUT URL",\n            rest_config.get("export_url", ""),\n        )\n\n        export_method = ask_text(\n            "Export method",\n            rest_config.get("export_method", "POST"),\n        ).upper()\n\n        if export_method not in ["POST", "PUT"]:\n            print("Unsupported export method entered; defaulting to POST.")\n            export_method = "POST"\n\n        rest_config["export_method"] = export_method\n        rest_config["batch_key"] = ask_text(\n            "Export batch key",\n            rest_config.get("batch_key", "orders"),\n        )\n\n    rest_config["headers"] = ask_json_object(\n        "Optional request headers as JSON object",\n        rest_config.get("headers", {}),\n    )\n\n    rest_config["params"] = ask_json_object(\n        "Optional query params as JSON object",\n        rest_config.get("params", {}),\n    )\n\n    rest_config["api_key"] = ask_text(\n        "API key/token, optional",\n        rest_config.get("api_key", ""),\n    )\n\n    if rest_config.get("api_key"):\n        rest_config["api_key_header"] = ask_text(\n            "API key header",\n            rest_config.get("api_key_header", "Authorization"),\n        )\n        rest_config["bearer_token"] = ask_yes_no(\n            "Use Bearer token format?",\n            bool(rest_config.get("bearer_token", True)),\n        )\n    else:\n        rest_config["api_key_header"] = rest_config.get(\n            "api_key_header",\n            "Authorization",\n        )\n        rest_config["bearer_token"] = bool(rest_config.get("bearer_token", True))\n\n    rest_config["poll_interval_seconds"] = ask_int(\n        "REST import poll interval in seconds",\n        int(rest_config.get("poll_interval_seconds", 60)),\n    )\n\n    rest_config["timeout_seconds"] = ask_int(\n        "Request timeout in seconds",\n        int(rest_config.get("timeout_seconds", 30)),\n    )\n\n    rest_config["max_retries"] = ask_int(\n        "Max request retries",\n        int(rest_config.get("max_retries", 3)),\n    )\n\n    config["rest_api"] = rest_config\n    return config\n\n\ndef main() -> None:\n    config = load_config()\n    config = configure_rest_api(config)\n    save_config(config)\n\n    print()\n    print("REST API settings saved to config.json.")\n\n    rest_config = config.get("rest_api", {})\n\n    if rest_config.get("import_enabled") and ask_yes_no(\n        "Test REST import GET now?",\n        True,\n    ):\n        test_get(rest_config.get("import_url", ""), rest_config)\n\n    if rest_config.get("export_enabled") and ask_yes_no(\n        "Send a small test export POST/PUT now?",\n        False,\n    ):\n        test_export_post(rest_config.get("export_url", ""), rest_config)\n\n    print()\n    print("Setup complete. You can now run start.bat or always_on_runtime.py.")\n\n\nif __name__ == "__main__":\n    main()\n'
+    content = '''"""
+setup_rest_api.py
+
+Simple customer REST API setup utility.
+
+Run from the generated package folder:
+    python setup_rest_api.py
+
+Or double-click:
+    setup_api.bat
+
+The customer only needs to provide:
+1. REST import endpoint
+2. REST export endpoint
+
+All other REST API settings use the existing/default configuration.
+"""
+
+import json
+from pathlib import Path
+
+
+PACKAGE_DIR = Path(__file__).resolve().parent
+CONFIG_PATH = PACKAGE_DIR / "config.json"
+
+
+def load_config() -> dict:
+    """Load the generated package config.json."""
+    if not CONFIG_PATH.exists():
+        raise FileNotFoundError(f"Missing config.json: {CONFIG_PATH}")
+
+    with open(CONFIG_PATH, "r", encoding="utf-8") as file:
+        return json.load(file)
+
+
+def save_config(config: dict) -> None:
+    """Save config.json."""
+    with open(CONFIG_PATH, "w", encoding="utf-8") as file:
+        json.dump(config, file, indent=4)
+
+
+def ask_endpoint(prompt: str, current_value: str = "") -> str:
+    """
+    Ask for an API endpoint.
+
+    If a value already exists, show it as the default so pressing Enter keeps
+    the current endpoint.
+    """
+    current_value = str(current_value or "").strip()
+
+    if current_value:
+        value = input(f"{prompt} [{current_value}]: ").strip()
+        return value or current_value
+
+    return input(f"{prompt}: ").strip()
+
+
+def configure_rest_api(config: dict) -> dict:
+    """
+    Configure only the REST import and export endpoints.
+
+    Existing advanced REST settings remain unchanged. Missing advanced settings
+    receive safe defaults without being shown to the customer.
+    """
+    rest_config = dict(config.get("rest_api", {}) or {})
+
+    print()
+    print("=" * 60)
+    print("MODULA REST API SETUP")
+    print("=" * 60)
+    print()
+
+    import_url = ask_endpoint(
+        "Import endpoint  (Customer -> Modula)",
+        rest_config.get("import_url", ""),
+    )
+
+    export_url = ask_endpoint(
+        "Export endpoint  (Modula -> Customer)",
+        rest_config.get("export_url", ""),
+    )
+
+    rest_config["import_url"] = import_url
+    rest_config["export_url"] = export_url
+
+    # A direction is enabled automatically when its endpoint is configured.
+    rest_config["import_enabled"] = bool(import_url)
+    rest_config["export_enabled"] = bool(export_url)
+    rest_config["enabled"] = (
+        rest_config["import_enabled"]
+        or rest_config["export_enabled"]
+    )
+
+    # Hidden runtime defaults. Existing values are preserved.
+    rest_config.setdefault("records_key", "")
+    rest_config.setdefault("export_method", "POST")
+    rest_config.setdefault("batch_key", "orders")
+    rest_config.setdefault("headers", {})
+    rest_config.setdefault("params", {})
+    rest_config.setdefault("api_key", "")
+    rest_config.setdefault("api_key_header", "Authorization")
+    rest_config.setdefault("bearer_token", True)
+    rest_config.setdefault("field_mapping", {})
+    rest_config.setdefault("poll_interval_seconds", 60)
+    rest_config.setdefault("timeout_seconds", 30)
+    rest_config.setdefault("max_retries", 3)
+
+    config["rest_api"] = rest_config
+    return config
+
+
+def main() -> None:
+    try:
+        config = load_config()
+        config = configure_rest_api(config)
+        save_config(config)
+
+        rest_config = config["rest_api"]
+
+        print()
+        print("=" * 60)
+        print("REST API SETUP COMPLETE")
+        print("=" * 60)
+        print()
+        print(
+            "Import endpoint: "
+            + (rest_config.get("import_url") or "Not configured")
+        )
+        print(
+            "Export endpoint: "
+            + (rest_config.get("export_url") or "Not configured")
+        )
+        print()
+        print("Configuration saved to config.json.")
+        print()
+
+    except Exception as error:
+        print()
+        print("=" * 60)
+        print("REST API SETUP FAILED")
+        print("=" * 60)
+        print()
+        print(error)
+        print()
+
+
+if __name__ == "__main__":
+    main()
+'''
+
     write_text(base / "setup_rest_api.py", content)
     print("  [OK] setup_rest_api.py written")
-
 
 def create_setup_api_bat(base: Path) -> None:
     content = '@echo off\necho Modula Middleware REST API Setup\necho.\n\ncd /d %~dp0\npython setup_rest_api.py\n\npause\n'
@@ -2081,7 +2229,12 @@ To configure REST without manually editing JSON, double-click:
 
        setup_api.bat
 
-The setup utility updates only the `rest_api` section of `config.json`.
+The setup utility asks only for:
+
+- The customer REST import endpoint.
+- The customer REST export endpoint.
+
+Everything else uses the existing runtime defaults in `config.json`.
 
 REST import flow:
 

@@ -1,8 +1,0 @@
-{
-    "customer_name": "DemoAPI",
-    "base_url": "https://example.com/api",
-    "orders_endpoint": "/orders",
-    "auth_type": "api_key",
-    "api_key_header": "Authorization",
-    "api_key_env_var": "DEMO_API_KEY"
-}

@@ -8,7 +8,7 @@ from typing import Any
 
 from agents.openai_field_mapping_agent import infer_field_mapping_with_openai
 from src.ai.header_extraction_agent import HeaderExtractionAgent
-from src.converters.csv_to_canonical import CsvToCanonicalConverter
+from src.parsing.csv_order_parser import CsvOrderParser
 from src.formatters.modula_ordini_xml_formatter import ModulaOrdiniXmlFormatter
 
 
@@ -36,7 +36,7 @@ class FileProcessingPipeline:
         self.errors_dir = Path(errors_dir)
 
         self.header_agent = HeaderExtractionAgent()
-        self.csv_converter = CsvToCanonicalConverter()
+        self.csv_parser = CsvOrderParser()
         self.formatter = ModulaOrdiniXmlFormatter()
 
         for d in [
@@ -418,7 +418,7 @@ class FileProcessingPipeline:
         field_mapping = profile.get("field_mapping", {})
         print(f"[Pipeline] Field mapping: {field_mapping}")
 
-        orders = self.csv_converter.convert(file_path, field_mapping)
+        orders = self.csv_parser.parse(file_path, field_mapping)
 
         return orders, source_type, profile
 

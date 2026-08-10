@@ -131,7 +131,7 @@ def validate_runtime_engine_files() -> None:
 
     required_paths = [
         Path("src") / "pipeline" / "file_processing_pipeline.py",
-        Path("src") / "converters" / "csv_to_canonical.py",
+        Path("src") / "parsing" / "csv_order_parser.py",
         Path("src") / "formatters" / "modula_ordini_xml_formatter.py",
         Path("src") / "ai" / "header_extraction_agent.py",
         Path("src") / "connectors" / "rest_api_connector.py",

@@ -29,7 +29,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from agents.openai_mapping_agent import infer_mapping_with_openai
+from agents.openai_field_mapping_agent import infer_mapping_with_openai
 
 
 INPUT_FOLDER = Path("runtime/customer_input")

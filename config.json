@@ -1,5 +1,5 @@
 {
 "API_KEY" :  "replace with your key",
-"OPENAI_API_BASE" : "https://aibe.mygreatlearning.com/openai/v1",
+"OPENAI_API_BASE" : "must provide your own OPENAI_API_BASE",
 "TAVILY_API_KEY" : "replace with your key"
 }
